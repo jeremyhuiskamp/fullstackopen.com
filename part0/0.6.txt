@@ -1,0 +1,9 @@
+note over browser:
+browser executes js code that
+appends to local notes list,
+redraws notes and sends new
+note to server
+end note
+
+browser->server: POST GET https://fullstack-exampleapp.herokuapp.com/new_note_spa\n{content: "new spa note", date: "2020-08-04T20:53:44.855Z"}
+server-->browser: 201 Created
