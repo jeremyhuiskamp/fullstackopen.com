@@ -5,15 +5,17 @@ const Header = (props) => (
   <h1>{props.course}</h1>
 )
 
+const Part = (props) => (
+  <tr>
+    <td>{props.name}</td>
+    <td>{props.exercises}</td>
+  </tr>
+)
+
 const Content = (props) => (
   <table>
     <tbody>
-      {props.parts.map(p =>
-        <tr key={p.name}>
-          <td>{p.name}</td>
-          <td>{p.exercises}</td>
-        </tr>
-      )}
+      {props.parts.map(p => <Part key={p.name} name={p.name} exercises={p.exercises} />)}
     </tbody>
   </table>
 )
