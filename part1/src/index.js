@@ -1,28 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const Header = (props) => (
-  <h1>{props.course}</h1>
-)
+const Header = (props) => <h1>{props.course}</h1>
 
-const Part = (props) => (
+const Part = (props) =>
   <tr>
     <td>{props.name}</td>
     <td>{props.exercises}</td>
   </tr>
-)
 
-const Content = (props) => (
+
+const Content = (props) =>
   <table>
     <tbody>
       {props.parts.map(p => <Part key={p.name} name={p.name} exercises={p.exercises} />)}
     </tbody>
   </table>
-)
 
-const Total = (props) => (
+const Total = (props) =>
   <p>Number of exercises: {props.parts.map(p => p.exercises).reduce((a, b) => a + b)}</p>
-)
 
 const App = () => {
   const course = 'Half Stack application development'
