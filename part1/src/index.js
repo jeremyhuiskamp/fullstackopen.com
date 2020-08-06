@@ -18,7 +18,7 @@ const Content = (props) =>
   </table>
 
 const Total = (props) =>
-  <p>Number of exercises: {props.parts.map(p => p.exercises).reduce((a, b) => a + b)}</p>
+  <p>Number of exercises: {props.parts.reduce((sum, part) => sum + part.exercises, 0)}</p>
 
 const App = () => {
   const course = 'Half Stack application development'
