@@ -3,8 +3,13 @@ import ReactDOM from 'react-dom'
 
 const Statistics = ({ good, bad, neutral }) => {
   const allRatings = good + neutral + bad
-  const averageRating = allRatings === 0 ? 0 : (good - bad) / allRatings
-  const positive = allRatings === 0 ? 0 : good / allRatings
+
+  if (allRatings <= 0) {
+    return <p>No feedback given</p>
+  }
+
+  const averageRating = (good - bad) / allRatings
+  const positive = good / allRatings
 
   return (
     <>
