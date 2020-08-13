@@ -10,6 +10,10 @@ const App = () => {
     setter(value + 1)
   }
 
+  const allRatings = good + neutral + bad
+  const averageRating = allRatings === 0 ? 0 : (good - bad) / allRatings
+  const positive = allRatings === 0 ? 0 : good / allRatings
+
   return (
     <div>
       <h2>give feedback</h2>
@@ -21,7 +25,10 @@ const App = () => {
       <h2>statistics</h2>
       good {good}<br />
       neutral {neutral}<br />
-      bad {bad}
+      bad {bad}<br />
+      all {allRatings}<br />
+      average {averageRating}<br />
+      positive {positive * 100} %
     </div>
   )
 }
