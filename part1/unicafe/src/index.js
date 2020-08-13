@@ -5,7 +5,12 @@ const Statistic = ({ text, value, percentage = false }) => {
   if (percentage) {
     value = <>{value * 100} %</>
   }
-  return <>{text} {value}<br /></>
+  return (
+    <tr>
+      <td>{text}</td>
+      <td>{value}</td>
+    </tr>
+  )
 }
 
 const Statistics = ({ good, bad, neutral }) => {
@@ -19,14 +24,16 @@ const Statistics = ({ good, bad, neutral }) => {
   const positive = good / allRatings
 
   return (
-    <>
-      <Statistic text="good" value={good} />
-      <Statistic text="neutral" value={neutral} />
-      <Statistic text="bad" value={bad} />
-      <Statistic text="all" value={allRatings} />
-      <Statistic text="average" value={averageRating} />
-      <Statistic text="positive" value={positive} percentage={true} />
-    </>
+    <table>
+      <tbody>
+        <Statistic text="good" value={good} />
+        <Statistic text="neutral" value={neutral} />
+        <Statistic text="bad" value={bad} />
+        <Statistic text="all" value={allRatings} />
+        <Statistic text="average" value={averageRating} />
+        <Statistic text="positive" value={positive} percentage={true} />
+      </tbody>
+    </table>
   )
 }
 
