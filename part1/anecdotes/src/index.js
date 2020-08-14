@@ -1,28 +1,36 @@
 import React, { useState } from 'react'
 import ReactDOM from 'react-dom'
+import indexOfHighestValue from './util'
+
+const Anecdote = ({ anecdotes, votes, index }) =>
+  <>
+    {anecdotes[index]}
+    <br />
+    has {votes[index]} vote{votes[index] === 1 ? '' : 's'}
+  </>
 
 const App = ({ anecdotes }) => {
   const randomAnecdoteIndex = () => Math.floor(Math.random() * anecdotes.length)
 
   const [votes, setVotes] = useState(Array(anecdotes.length).fill(0))
-  const [selected, setSelected] = useState(randomAnecdoteIndex())
+  const [selectedIndex, setSelectedIndex] = useState(randomAnecdoteIndex())
 
   const vote = () => {
     const newVotes = [...votes]
-    newVotes[selected]++
+    newVotes[selectedIndex]++
     setVotes(newVotes)
   }
 
-  const selectedVotes = votes[selected]
-
   return (
     <>
-      {anecdotes[selected]}
-      <br />
-      has {selectedVotes} vote{selectedVotes === 1 ? "" : "s"}
+      <h2>Anecdote of the day</h2>
+      <Anecdote anecdotes={anecdotes} votes={votes} index={selectedIndex} />
       <br />
       <button onClick={vote}>vote</button>
-      <button onClick={() => setSelected(randomAnecdoteIndex())}>next anedcote</button>
+      <button onClick={() => setSelectedIndex(randomAnecdoteIndex())}>next anecdote</button>
+
+      <h2>Anecdote with most votes</h2>
+      <Anecdote anecdotes={anecdotes} votes={votes} index={indexOfHighestValue(votes)} />
     </>
   )
 }
