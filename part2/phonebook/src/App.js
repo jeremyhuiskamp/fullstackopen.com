@@ -10,8 +10,14 @@ const App = () => {
     const submit = (e) => {
         e.preventDefault();
         inputRef.current.focus();
-        setNewName('')
+
         const trimmed = newName.trim()
+        if (persons.some(p => p.name === trimmed)) {
+            alert(`${trimmed} is already added to phonebook`)
+            return
+        }
+
+        setNewName('')
         if (trimmed !== '') {
             setPersons([...persons, { name: trimmed }])
         }
