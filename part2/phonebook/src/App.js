@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 
 const Filter = ({ filter, setFilter }) =>
     <div>
@@ -44,7 +45,7 @@ const Persons = ({ persons, filter }) => {
             </thead>
             <tbody>
                 {filteredPersons.map(p =>
-                    <tr key={p.name}>
+                    <tr key={p.id}>
                         <td>{p.name}</td>
                         <td>{p.number}</td>
                     </tr>
@@ -55,15 +56,17 @@ const Persons = ({ persons, filter }) => {
 }
 
 const App = () => {
-    const [persons, setPersons] = useState([
-        { name: 'Arto Hellas', number: '1234567' },
-        { name: 'Ada Lovelace', number: '39-44-5323523' },
-        { name: 'Dan Abramov', number: '12-43-234345' },
-        { name: 'Mary Poppendieck', number: '39-23-6423122' },
-    ])
+    const [persons, setPersons] = useState([])
     const [filter, setFilter] = useState('')
     const [newName, setNewName] = useState('')
     const [newNumber, setNewNumber] = useState('')
+
+    useEffect(() => {
+        axios.get('http://localhost:3001/persons')
+            .then(rsp => {
+                setPersons(rsp.data);
+            });
+    }, []);
 
     const tryNewName = () => {
         const trimmed = newName.trim()
@@ -75,7 +78,12 @@ const App = () => {
         if (trimmed !== '') {
             setNewName('')
             setNewNumber('')
-            setPersons([...persons, { name: trimmed, number: newNumber.trim() }])
+            const maxID = Math.max(...persons.map(p => p.id))
+            setPersons([...persons, {
+                name: trimmed,
+                number: newNumber.trim(),
+                id: maxID + 1
+            }])
         }
     }
 
