@@ -14,27 +14,37 @@ const Country = ({ country }) => {
   </div>
 };
 
-const CountryList = ({ countries }) => {
+const CountryList = ({ countries, setSelectedCountry }) => {
   return <ul>
-    {countries.map(c => <li key={c.name}>{c.name}</li>)}
+    {countries.map(c =>
+      <li key={c.name}>
+        {c.name}
+        &nbsp;
+        <button onClick={() => { setSelectedCountry(c.alpha3Code) }}>show</button>
+      </li>)}
   </ul>
 };
 
-const Countries = ({ filter, countries }) => {
+const Countries = ({ selectedCountry, setSelectedCountry, filter, countries }) => {
   const filteredCountries = countries.filter(c =>
-    c.name.toLowerCase().includes(filter.trim().toLowerCase())
+    selectedCountry !== '' ?
+      selectedCountry === c.alpha3Code :
+      c.name.toLowerCase().includes(filter.trim().toLowerCase())
   );
 
   if (filteredCountries.length === 1) {
     return <Country country={filteredCountries[0]} />
   } else if (filteredCountries.length <= 10) {
-    return <CountryList countries={filteredCountries} />
+    return <CountryList
+      countries={filteredCountries}
+      setSelectedCountry={setSelectedCountry} />
   } else {
     return <p>Too many matches, specify another filter</p>
   }
 };
 
 const App = () => {
+  const [selectedCountry, setSelectedCountry] = useState('');
   const [countries, setCountries] = useState([]);
   const [filter, setFilter] = useState('');
 
@@ -50,10 +60,19 @@ const App = () => {
     <>
       <div>
         find countries:
-        <input value={filter} onChange={(e) => setFilter(e.target.value)} />
+        &nbsp;
+        <input value={filter} onChange={(e) => {
+          setFilter(e.target.value);
+          setSelectedCountry('');
+        }
+        } />
       </div>
 
-      <Countries filter={filter} countries={countries} />
+      <Countries
+        filter={filter}
+        countries={countries}
+        selectedCountry={selectedCountry}
+        setSelectedCountry={setSelectedCountry} />
     </>
   );
 }
