@@ -46,16 +46,27 @@ const PersonForm = ({ persons, setPersons }) => {
     )
 }
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, filter, setPersons }) => {
     const filteredPersons = persons.filter(p =>
         p.name.toLowerCase().includes(filter.trim().toLowerCase())
     )
+    const drop = person => {
+        if (!window.confirm(`Delete ${person.name}?`)) {
+            return;
+        }
+        personService.delete(person.id)
+            .then(() => {
+                setPersons(persons.filter(
+                    p => p.id !== person.id));
+            });
+    };
     return (
         <table>
             <thead>
                 <tr>
                     <td>Name</td>
                     <td>Number</td>
+                    <td>Delete</td>
                 </tr>
             </thead>
             <tbody>
@@ -63,6 +74,12 @@ const Persons = ({ persons, filter }) => {
                     <tr key={p.id}>
                         <td>{p.name}</td>
                         <td>{p.number}</td>
+                        <td>
+                            <button
+                                onClick={() => drop(p)}>
+                                do it
+                            </button>
+                        </td>
                     </tr>
                 )}
             </tbody>
@@ -88,7 +105,7 @@ const App = () => {
             <PersonForm persons={persons} setPersons={setPersons} />
 
             <h3>Numbers</h3>
-            <Persons persons={persons} filter={filter} />
+            <Persons persons={persons} filter={filter} setPersons={setPersons} />
         </div>
     )
 }

@@ -10,7 +10,10 @@ const create = (name, number) =>
         name, number
     }).then(rsp => rsp.data);
 
+const delete_ = id =>
+    axios.delete(`${baseURL}/${id}`);
+
 const exports = {
-    getAll, create,
+    getAll, create, delete: delete_,
 };
 export default exports;
