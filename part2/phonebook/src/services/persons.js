@@ -13,7 +13,11 @@ const create = (name, number) =>
 const delete_ = id =>
     axios.delete(`${baseURL}/${id}`);
 
+const patch = (id, changes) => axios
+    .patch(`${baseURL}/${id}`, changes)
+    .then(rsp => rsp.data);
+
 const exports = {
-    getAll, create, delete: delete_,
+    getAll, create, delete: delete_, patch,
 };
 export default exports;

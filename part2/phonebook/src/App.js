@@ -6,7 +6,7 @@ const Filter = ({ filter, setFilter }) =>
         filter shown with <input value={filter} onChange={(e) => setFilter(e.target.value)} />
     </div>
 
-const PersonForm = ({ persons, setPersons }) => {
+const PersonForm = ({ persons, refreshPersons }) => {
     const [newName, setNewName] = useState('');
     const [newNumber, setNewNumber] = useState('');
     const inputRef = React.createRef();
@@ -15,20 +15,31 @@ const PersonForm = ({ persons, setPersons }) => {
         e.preventDefault();
         inputRef.current.focus();
 
+        const reset = () => {
+            setNewName('');
+            setNewNumber('');
+            refreshPersons();
+        }
+
         const trimmed = newName.trim();
-        if (persons.some(p => p.name === trimmed)) {
-            alert(`${trimmed} is already added to phonebook`);
+        if (trimmed === '') {
             return;
-        } else if (trimmed === '') {
+        }
+        const existing = persons.find(p => p.name === trimmed);
+        if (existing) {
+            if (!window.confirm(`${existing.name} is already added to ` +
+                `phonebook, replace old number with a new one?`)) {
+                return;
+            }
+            personService
+                .patch(existing.id, { number: newNumber.trim() })
+                .then(reset);
             return;
         }
 
-        personService.create(trimmed, newNumber.trim())
-            .then(data => {
-                setNewName('');
-                setNewNumber('');
-                setPersons([...persons, data]);
-            });
+        personService
+            .create(trimmed, newNumber.trim())
+            .then(reset);
     };
 
     return (
@@ -46,7 +57,7 @@ const PersonForm = ({ persons, setPersons }) => {
     )
 }
 
-const Persons = ({ persons, filter, setPersons }) => {
+const Persons = ({ persons, filter, refreshPersons }) => {
     const filteredPersons = persons.filter(p =>
         p.name.toLowerCase().includes(filter.trim().toLowerCase())
     )
@@ -54,11 +65,7 @@ const Persons = ({ persons, filter, setPersons }) => {
         if (!window.confirm(`Delete ${person.name}?`)) {
             return;
         }
-        personService.delete(person.id)
-            .then(() => {
-                setPersons(persons.filter(
-                    p => p.id !== person.id));
-            });
+        personService.delete(person.id).then(refreshPersons);
     };
     return (
         <table>
@@ -88,12 +95,14 @@ const Persons = ({ persons, filter, setPersons }) => {
 }
 
 const App = () => {
-    const [persons, setPersons] = useState([])
-    const [filter, setFilter] = useState('')
+    const [persons, setPersons] = useState([]);
+    const [filter, setFilter] = useState('');
 
-    useEffect(() => {
+    const refreshPersons = () => {
         personService.getAll().then(setPersons);
-    }, []);
+    };
+
+    useEffect(refreshPersons, []);
 
     return (
         <div>
@@ -102,10 +111,10 @@ const App = () => {
             <Filter filter={filter} setFilter={setFilter} />
 
             <h3>add a new</h3>
-            <PersonForm persons={persons} setPersons={setPersons} />
+            <PersonForm persons={persons} refreshPersons={refreshPersons} />
 
             <h3>Numbers</h3>
-            <Persons persons={persons} filter={filter} setPersons={setPersons} />
+            <Persons persons={persons} filter={filter} refreshPersons={refreshPersons} />
         </div>
     )
 }
