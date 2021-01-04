@@ -6,15 +6,32 @@ const Filter = ({ filter, setFilter }) =>
         filter shown with <input value={filter} onChange={(e) => setFilter(e.target.value)} />
     </div>
 
-const PersonForm = ({ newName, setNewName, newNumber, setNewNumber, tryNewName }) => {
-    const inputRef = React.createRef()
+const PersonForm = ({ persons, setPersons }) => {
+    const [newName, setNewName] = useState('');
+    const [newNumber, setNewNumber] = useState('');
+    const inputRef = React.createRef();
 
     const submit = (e) => {
-        e.preventDefault()
-        inputRef.current.focus()
+        e.preventDefault();
+        inputRef.current.focus();
 
-        tryNewName()
-    }
+        const trimmed = newName.trim();
+        if (persons.some(p => p.name === trimmed)) {
+            alert(`${trimmed} is already added to phonebook`);
+            return;
+        } else if (trimmed === '') {
+            return;
+        }
+
+        axios.post("http://localhost:3001/persons", {
+            name: trimmed,
+            number: newNumber.trim(),
+        }).then(rsp => {
+            setNewName('');
+            setNewNumber('');
+            setPersons([...persons, rsp.data]);
+        });
+    };
 
     return (
         <form onSubmit={submit}>
@@ -58,8 +75,6 @@ const Persons = ({ persons, filter }) => {
 const App = () => {
     const [persons, setPersons] = useState([])
     const [filter, setFilter] = useState('')
-    const [newName, setNewName] = useState('')
-    const [newNumber, setNewNumber] = useState('')
 
     useEffect(() => {
         axios.get('http://localhost:3001/persons')
@@ -68,25 +83,6 @@ const App = () => {
             });
     }, []);
 
-    const tryNewName = () => {
-        const trimmed = newName.trim()
-        if (persons.some(p => p.name === trimmed)) {
-            alert(`${trimmed} is already added to phonebook`)
-            return
-        }
-
-        if (trimmed !== '') {
-            setNewName('')
-            setNewNumber('')
-            const maxID = Math.max(...persons.map(p => p.id))
-            setPersons([...persons, {
-                name: trimmed,
-                number: newNumber.trim(),
-                id: maxID + 1
-            }])
-        }
-    }
-
     return (
         <div>
             <h2>Phonebook</h2>
@@ -94,10 +90,7 @@ const App = () => {
             <Filter filter={filter} setFilter={setFilter} />
 
             <h3>add a new</h3>
-            <PersonForm
-                newName={newName} setNewName={setNewName}
-                newNumber={newNumber} setNewNumber={setNewNumber}
-                tryNewName={tryNewName} />
+            <PersonForm persons={persons} setPersons={setPersons} />
 
             <h3>Numbers</h3>
             <Persons persons={persons} filter={filter} />
