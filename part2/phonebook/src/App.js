@@ -70,6 +70,12 @@ const Persons = ({ persons, filter, refreshPersons, notify }) => {
         personService
             .delete(person.id)
             .then(() => notify(`'${person.name}' deleted.`))
+            .catch(e => {
+                const msg = personService.isNotExistingError(e) ?
+                    `'${person.name}' doesn't exist.` :
+                    `Uh oh: ${e}`;
+                notify(msg, true);
+            })
             .then(refreshPersons);
     };
     return (
@@ -99,18 +105,22 @@ const Persons = ({ persons, filter, refreshPersons, notify }) => {
     )
 }
 
-const Notification = ({ msg }) => {
+const Notification = ({ msg, isError }) => {
     if (!msg) {
         return null;
     }
 
-    return <div className="notification">{msg}</div>
+    const style = {
+        color: isError ? "red" : "green",
+    };
+    return <div className="notification" style={style}>{msg}</div>
 };
 
 const App = () => {
     const [persons, setPersons] = useState([]);
     const [filter, setFilter] = useState('');
     const [notification, setNotification] = useState(null);
+    const [notificationIsError, setNotificationIsError] = useState(false);
     const [notificationTimeout, setNotificationTimeout] = useState(null);
 
     const refreshPersons = () => {
@@ -119,8 +129,9 @@ const App = () => {
 
     useEffect(refreshPersons, []);
 
-    const notify = (msg) => {
+    const notify = (msg, isError = false) => {
         setNotification(msg);
+        setNotificationIsError(isError);
 
         // cancel previous timeout so that we don't wipe
         // this notification early...
@@ -133,7 +144,7 @@ const App = () => {
     return (
         <div>
             <h2>Phonebook</h2>
-            <Notification msg={notification} />
+            <Notification msg={notification} isError={notificationIsError} />
 
             <Filter filter={filter} setFilter={setFilter} />
 

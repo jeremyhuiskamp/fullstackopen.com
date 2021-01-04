@@ -13,11 +13,13 @@ const create = (name, number) =>
 const delete_ = id =>
     axios.delete(`${baseURL}/${id}`);
 
+const isNotExistingError = e => e.response && e.response.status === 404;
+
 const patch = (id, changes) => axios
     .patch(`${baseURL}/${id}`, changes)
     .then(rsp => rsp.data);
 
 const exports = {
-    getAll, create, delete: delete_, patch,
+    getAll, create, delete: delete_, patch, isNotExistingError,
 };
 export default exports;
