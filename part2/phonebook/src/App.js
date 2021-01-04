@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
+import personService from './services/persons';
 
 const Filter = ({ filter, setFilter }) =>
     <div>
@@ -23,14 +23,12 @@ const PersonForm = ({ persons, setPersons }) => {
             return;
         }
 
-        axios.post("http://localhost:3001/persons", {
-            name: trimmed,
-            number: newNumber.trim(),
-        }).then(rsp => {
-            setNewName('');
-            setNewNumber('');
-            setPersons([...persons, rsp.data]);
-        });
+        personService.create(trimmed, newNumber.trim())
+            .then(data => {
+                setNewName('');
+                setNewNumber('');
+                setPersons([...persons, data]);
+            });
     };
 
     return (
@@ -77,10 +75,7 @@ const App = () => {
     const [filter, setFilter] = useState('')
 
     useEffect(() => {
-        axios.get('http://localhost:3001/persons')
-            .then(rsp => {
-                setPersons(rsp.data);
-            });
+        personService.getAll().then(setPersons);
     }, []);
 
     return (
