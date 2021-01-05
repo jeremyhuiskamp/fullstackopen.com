@@ -43,16 +43,22 @@ const PersonForm = ({ persons, refreshPersons, notify }) => {
             personService
                 .patch(existing.id, { number: newNumber.trim() })
                 .then(() => notify(`Number updated for '${existing.name}'.`))
-                .catch(e => notify(errMsg(e, existing), true))
-                .then(reset);
+                .then(reset)
+                .catch(e => {
+                    notify(errMsg(e, existing), true);
+                    refreshPersons();
+                });
             return;
         }
 
         personService
             .create(trimmed, newNumber.trim())
             .then(() => notify(`Added '${trimmed}'.`))
-            .catch(e => notify(errMsg(e), true))
-            .then(reset);
+            .then(reset)
+            .catch(e => {
+                notify(errMsg(e, existing), true);
+                refreshPersons();
+            });
     };
 
     return (
