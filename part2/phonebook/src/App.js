@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import personService from './services/persons';
 
+const errMsg = (e, person) => {
+    if (person && personService.isNotExistingError(e)) {
+        return `'${person.name}' doesn't exist.`;
+    }
+
+    const reason = e.response?.data?.error ?? e.message ?? e.toString();
+    return `Unexpected error: ${reason}`
+};
+
 const Filter = ({ filter, setFilter }) =>
     <div>
         filter shown with <input value={filter} onChange={(e) => setFilter(e.target.value)} />
@@ -11,8 +20,8 @@ const PersonForm = ({ persons, refreshPersons, notify }) => {
     const [newNumber, setNewNumber] = useState('');
     const inputRef = React.createRef();
 
-    const submit = (e) => {
-        e.preventDefault();
+    const submit = (event) => {
+        event.preventDefault();
         inputRef.current.focus();
 
         const reset = () => {
@@ -34,6 +43,7 @@ const PersonForm = ({ persons, refreshPersons, notify }) => {
             personService
                 .patch(existing.id, { number: newNumber.trim() })
                 .then(() => notify(`Number updated for '${existing.name}'.`))
+                .catch(e => notify(errMsg(e, existing), true))
                 .then(reset);
             return;
         }
@@ -41,6 +51,7 @@ const PersonForm = ({ persons, refreshPersons, notify }) => {
         personService
             .create(trimmed, newNumber.trim())
             .then(() => notify(`Added '${trimmed}'.`))
+            .catch(e => notify(errMsg(e), true))
             .then(reset);
     };
 
@@ -70,12 +81,7 @@ const Persons = ({ persons, filter, refreshPersons, notify }) => {
         personService
             .delete(person.id)
             .then(() => notify(`'${person.name}' deleted.`))
-            .catch(e => {
-                const msg = personService.isNotExistingError(e) ?
-                    `'${person.name}' doesn't exist.` :
-                    `Uh oh: ${e}`;
-                notify(msg, true);
-            })
+            .catch(e => notify(errMsg(e, person), true))
             .then(refreshPersons);
     };
     return (
@@ -132,6 +138,7 @@ const App = () => {
     const notify = (msg, isError = false) => {
         setNotification(msg);
         setNotificationIsError(isError);
+        console.log(msg);
 
         // cancel previous timeout so that we don't wipe
         // this notification early...

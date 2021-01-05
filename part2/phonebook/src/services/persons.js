@@ -13,7 +13,7 @@ const create = (name, number) =>
 const delete_ = id =>
     axios.delete(`${baseURL}/${id}`);
 
-const isNotExistingError = e => e.response && e.response.status === 404;
+const isNotExistingError = e => e.response?.status === 404;
 
 const patch = (id, changes) => axios
     .patch(`${baseURL}/${id}`, changes)
