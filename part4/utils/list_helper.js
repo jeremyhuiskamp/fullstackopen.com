@@ -16,6 +16,24 @@ const favouriteBlog = blogs =>
 const chooseBest = (things, chooseFunc) =>
     things.reduce((a, b) => a === undefined ? b : chooseFunc(a, b), undefined);
 
+// bestAuthor takes a function that picks an interesting field from an author
+// and returns a function that chooses which of two authors have the higher
+// value for that field.  Ties are broken by comparing author names.
+const chooseAuthorBy = fieldChooser => (author1, author2) => {
+    const field1 = fieldChooser(author1);
+    const field2 = fieldChooser(author2);
+
+    if (field1 > field2) {
+        return author1;
+    } else if (field2 > field1) {
+        return author2;
+    } else if (author1.author < author2.author) {
+        return author1;
+    } else {
+        return author2;
+    }
+};
+
 const mostBlogs = blogs => {
     // { "author1": 1, "author2": 2 }
     const counted = _.countBy(blogs, b => b.author);
@@ -23,21 +41,25 @@ const mostBlogs = blogs => {
     // [ { author: "author1", blogs: 1 }, { author: "author2", blogs: 2 } ]
     const authors = _.toPairs(counted).map(([author, blogs]) => ({ author, blogs }));
 
-    return chooseBest(authors, (a1, a2) => {
-        if (a1.blogs > a2.blogs) {
-            return a1;
-        } else if (a2.blogs > a1.blogs) {
-            return a2;
-        } else if (a1.author < a2.author) {
-            return a1;
-        } else {
-            return a2;
-        }
-    });
+    return chooseBest(authors, chooseAuthorBy(a => a.blogs));
+};
+
+const mostLikes = blogs => {
+    // { "author1": [ ... blogs ... ], "author2": [ ... blogs ... ] }
+    const grouped = _.groupBy(blogs, b => b.author);
+
+    // [ { author: "author1", likes: 1 }, { author: "author2", likes: 2 } ]
+    const authors = _.toPairs(grouped).map(([author, blogs]) => ({
+        author,
+        likes: _.sumBy(blogs, b => b.likes),
+    }));
+
+    return chooseBest(authors, chooseAuthorBy(a => a.likes));
 };
 
 module.exports = {
     totalLikes,
     favouriteBlog,
     mostBlogs,
+    mostLikes,
 };
