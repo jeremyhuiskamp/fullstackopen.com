@@ -1,15 +1,5 @@
 const _ = require('lodash');
 
-const totalLikes = blogs =>
-    blogs.reduce((sum, blog) => sum + blog.likes, 0);
-
-const favouriteBlog = blogs =>
-    blogs.reduce((fave, blog) => fave?.likes > blog.likes ? fave : {
-        title: blog.title,
-        author: blog.author,
-        likes: blog.likes,
-    }, undefined);
-
 // chooseBest returns the best thing from things, using chooseFunc to choose
 // between any two things.  If there is only 1 thing, it is the best.  If
 // there are zero things, the best is undefined.
@@ -34,6 +24,21 @@ const chooseAuthorBy = fieldChooser => (author1, author2) => {
     }
 };
 
+// returns f(thing) if thing is defined, otherwise undefined.
+const maybeMap = (thing, f) =>
+    thing === undefined ? undefined : f(thing);
+
+const totalLikes = blogs => _.sumBy(blogs, b => b.likes);
+
+const favouriteBlog = blogs => {
+    const blog = chooseBest(blogs, (b1, b2) => b1.likes > b2.likes ? b1 : b2);
+    return maybeMap(blog, blog => ({
+        title: blog.title,
+        author: blog.author,
+        likes: blog.likes,
+    }));
+};
+
 const mostBlogs = blogs => {
     // { "author1": 1, "author2": 2 }
     const counted = _.countBy(blogs, b => b.author);
@@ -49,9 +54,9 @@ const mostLikes = blogs => {
     const grouped = _.groupBy(blogs, b => b.author);
 
     // [ { author: "author1", likes: 1 }, { author: "author2", likes: 2 } ]
-    const authors = _.toPairs(grouped).map(([author, blogs]) => ({
+    const authors = _.toPairs(grouped).map(([author, authorsBlogs]) => ({
         author,
-        likes: _.sumBy(blogs, b => b.likes),
+        likes: totalLikes(authorsBlogs),
     }));
 
     return chooseBest(authors, chooseAuthorBy(a => a.likes));
