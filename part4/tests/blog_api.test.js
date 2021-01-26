@@ -33,6 +33,18 @@ test('initial blogs are returned as json', async () => {
     expect(rsp.body).toHaveLength(initialBlogs.length);
 });
 
+test('blogs have id', async () => {
+    const rsp = await api
+        .get('/api/blogs')
+        .expect(200);
+
+    expect(rsp.body).toHaveLength(initialBlogs.length);
+    rsp.body.forEach(blog => {
+        expect(blog.id).toBeDefined();
+        expect(blog.id.length).toBeGreaterThan(0);
+    });
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
