@@ -45,6 +45,27 @@ test('blogs have id', async () => {
     });
 });
 
+test('can post blog', async () => {
+    await api.post('/api/blogs').send({
+        title: 'new title',
+        author: 'new author',
+        url: 'new url',
+        likes: 3,
+    }).expect(201);
+
+    const blogs = await api
+        .get('/api/blogs')
+        .expect(200);
+    expect(blogs.body).toHaveLength(initialBlogs.length + 1);
+    const newBlog = blogs.body.find(b => b.title === 'new title');
+    expect(newBlog).toMatchObject({
+        title: 'new title',
+        author: 'new author',
+        url: 'new url',
+        likes: 3,
+    });
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
