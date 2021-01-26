@@ -82,6 +82,26 @@ test('likes defaults to 0', async () => {
     });
 });
 
+test('required fields', async () => {
+    await api
+        .post('/api/blogs')
+        .send({
+            author: 'author3',
+            url: 'url3',
+            likes: 3,
+        })
+        .expect(400);
+
+    await api
+        .post('/api/blogs')
+        .send({
+            title: 'title4',
+            author: 'author4',
+            likes: 4,
+        })
+        .expect(400);
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
