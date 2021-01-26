@@ -66,6 +66,22 @@ test('can post blog', async () => {
     });
 });
 
+test('likes defaults to 0', async () => {
+    await api.post('/api/blogs').send({
+        title: 'new title',
+        author: 'new author',
+        url: 'new url',
+    }).expect(201);
+
+    const blogs = await api
+        .get('/api/blogs')
+        .expect(200);
+    const newBlog = blogs.body.find(b => b.title === 'new title');
+    expect(newBlog).toMatchObject({
+        likes: 0,
+    });
+});
+
 afterAll(() => {
     mongoose.connection.close();
 });
