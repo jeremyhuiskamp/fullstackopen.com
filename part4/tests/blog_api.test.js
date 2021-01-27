@@ -102,6 +102,44 @@ test('required fields', async () => {
         .expect(400);
 });
 
+
+describe('blog deletion', () => {
+    test('delete existing blog', async () => {
+        const savedBlogs =
+            (await api
+                .get('/api/blogs')
+                .expect(200)
+            ).body;
+
+        const deletedBlog =
+            (await api
+                .delete('/api/blogs/' + savedBlogs[0].id)
+                .expect(200)
+            ).body;
+        expect(deletedBlog).toEqual(savedBlogs[0]);
+
+        const savedBlogsAfterDelete =
+            (await api
+                .get('/api/blogs')
+                .expect(200)
+            ).body;
+        expect(savedBlogsAfterDelete).toHaveLength(savedBlogs.length - 1);
+        // hmm, are we relying on order here?
+        expect(savedBlogsAfterDelete).toEqual(savedBlogs.slice(1));
+    });
+
+    test('delete non-existing blog', async () => {
+        await api.delete('/api/blogs/6011cc124bf051e42dfb6e87').expect(404);
+        const remainingBlogs =
+            (await api
+                .get('/api/blogs')
+                .expect(200)
+            ).body;
+        expect(remainingBlogs).toHaveLength(initialBlogs.length);
+    });
+});
+
+
 afterAll(() => {
     mongoose.connection.close();
 });
