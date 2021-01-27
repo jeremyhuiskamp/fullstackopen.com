@@ -22,4 +22,15 @@ router.delete('/:id', async (request, response) => {
     }
 });
 
+router.patch('/:id', async (request, response) => {
+    const blog = await Blog.findById(request.params.id);
+    if (!blog) {
+        return response.status(404).end();
+    }
+
+    blog.likes = request.body.likes ?? blog.likes;
+    const savedBlog = await blog.save();
+    response.json(savedBlog);
+});
+
 module.exports = router;

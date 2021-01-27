@@ -139,6 +139,42 @@ describe('blog deletion', () => {
     });
 });
 
+describe('blog updating', () => {
+    test('update existing blog', async () => {
+        const savedBlog =
+            (await api
+                .get('/api/blogs')
+                .expect(200)
+            ).body[0];
+
+        const updatedBlog =
+            (await api
+                .patch('/api/blogs/' + savedBlog.id)
+                .send({
+                    likes: 427000,
+                }).expect(200)
+            ).body;
+
+        expect(updatedBlog).toEqual({ ...savedBlog, likes: 427000 });
+
+        const allBlogs =
+            (await api
+                .get('/api/blogs/')
+                .expect(200)
+            ).body;
+
+        expect(allBlogs.find(b => b.id === savedBlog.id)).toEqual(updatedBlog);
+    });
+
+    test('update non-existing blog', async () => {
+        await api
+            .patch('/api/blogs/6011cc124bf051e42dfb6e87')
+            .send({
+                likes: 427000,
+            }).expect(404);
+    });
+});
+
 
 afterAll(() => {
     mongoose.connection.close();
