@@ -3,6 +3,9 @@ const supertest = require('supertest');
 const app = require('../app');
 const api = supertest(app);
 const Blog = require('../models/blog');
+const User = require('../models/user');
+
+var initialUser;
 
 const initialBlogs = [
     {
@@ -19,9 +22,29 @@ const initialBlogs = [
     },
 ];
 
+// Replaces the blog's user with just its id.
+const withOnlyUserId = (blog) => ({
+    ...blog,
+    user: blog.user.id,
+});
+
+const withFullUser = (blog, blogWithUser) => ({
+    ...blog,
+    user: blogWithUser.user,
+});
+
 beforeEach(async () => {
+    await User.deleteMany({});
+    initialUser = await new User({
+        username: 'user1',
+        name: 'user number1',
+        passwordHash: 'sekret',
+    }).save();
+
     await Blog.deleteMany({});
-    await Promise.all(initialBlogs.map(b => new Blog(b).save()));
+    await Promise.all(initialBlogs
+        .map(b => ({ ...b, user: initialUser._id }))
+        .map(b => new Blog(b).save()));
 });
 
 test('initial blogs are returned as json', async () => {
@@ -51,6 +74,7 @@ test('can post blog', async () => {
         author: 'new author',
         url: 'new url',
         likes: 3,
+        user: initialUser._id.toString(),
     }).expect(201);
 
     const blogs = await api
@@ -71,6 +95,7 @@ test('likes defaults to 0', async () => {
         title: 'new title',
         author: 'new author',
         url: 'new url',
+        user: initialUser._id.toString(),
     }).expect(201);
 
     const blogs = await api
@@ -116,7 +141,7 @@ describe('blog deletion', () => {
                 .delete('/api/blogs/' + savedBlogs[0].id)
                 .expect(200)
             ).body;
-        expect(deletedBlog).toEqual(savedBlogs[0]);
+        expect(deletedBlog).toEqual(withOnlyUserId(savedBlogs[0]));
 
         const savedBlogsAfterDelete =
             (await api
@@ -155,7 +180,10 @@ describe('blog updating', () => {
                 }).expect(200)
             ).body;
 
-        expect(updatedBlog).toEqual({ ...savedBlog, likes: 427000 });
+        expect(updatedBlog).toEqual({
+            ...withOnlyUserId(savedBlog),
+            likes: 427000,
+        });
 
         const allBlogs =
             (await api
@@ -163,7 +191,7 @@ describe('blog updating', () => {
                 .expect(200)
             ).body;
 
-        expect(allBlogs.find(b => b.id === savedBlog.id)).toEqual(updatedBlog);
+        expect(allBlogs.find(b => b.id === savedBlog.id)).toEqual(withFullUser(updatedBlog, savedBlog));
     });
 
     test('update non-existing blog', async () => {
@@ -174,7 +202,6 @@ describe('blog updating', () => {
             }).expect(404);
     });
 });
-
 
 afterAll(() => {
     mongoose.connection.close();

@@ -1,15 +1,29 @@
 const router = require('express').Router();
 require('express-async-errors');
 const Blog = require('../models/blog');
+const User = require('../models/user');
 
 router.get('/', async (request, response) => {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate('user', { blogs: 0 });
     response.json(blogs);
 });
 
 router.post('/', async (request, response) => {
-    const blog = new Blog(request.body);
+    const user = await User.findById(request.body.user);
+    if (!user) {
+        return response.status(400).json({ error: 'unknown user' });
+    }
+    delete request.body.user;
+
+    const blog = new Blog({
+        ...request.body,
+        user: user._id,
+    });
     const result = await blog.save();
+
+    user.blogs.push(result._id);
+    await user.save();
+
     response.status(201).json(result);
 });
 
