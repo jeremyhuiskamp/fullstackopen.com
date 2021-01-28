@@ -5,10 +5,12 @@ const api = supertest(app);
 const User = require('../models/user');
 const bcrypt = require('bcrypt');
 
+beforeEach(async () => {
+    await User.deleteMany({});
+});
+
 describe('when there is initially one user in db', () => {
     beforeEach(async () => {
-        await User.deleteMany({});
-
         const passwordHash = await bcrypt.hash('sekret', 10);
         await new User({ username: 'root', passwordHash }).save();
     });
@@ -64,6 +66,64 @@ describe('when there is initially one user in db', () => {
             ).body;
         expect(users).toHaveLength(1);
         expect(users[0]).toMatchObject({ blogs: [] });
+    });
+});
+
+describe('restrictions on user creation', () => {
+    test('user name is required', async () => {
+        const result = await api
+            .post('/api/users')
+            .send({
+                password: 'sekret',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/);
+        expect(result.body.error).toContain('`username` is required');
+
+        expect(await User.find({})).toHaveLength(0);
+    });
+
+    test('user name may not be less than 3 characters', async () => {
+        const result = await api
+            .post('/api/users')
+            .send({
+                username: 'ab',
+                password: 'sekret',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/);
+        expect(result.body.error).toContain('`username`');
+        expect(result.body.error).toContain('shorter');
+
+        expect(await User.find({})).toHaveLength(0);
+    });
+
+    test('password required', async () => {
+        const result = await api
+            .post('/api/users')
+            .send({
+                username: 'abc',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/);
+        expect(result.body.error).toContain('`password` is required');
+
+        expect(await User.find({})).toHaveLength(0);
+    });
+
+    test('password may not be less than 3 characters', async () => {
+        const result = await api
+            .post('/api/users')
+            .send({
+                username: 'abc',
+                password: 'se',
+            })
+            .expect(400)
+            .expect('Content-Type', /application\/json/);
+        expect(result.body.error).toContain('`password`');
+        expect(result.body.error).toContain('shorter');
+
+        expect(await User.find({})).toHaveLength(0);
     });
 });
 
