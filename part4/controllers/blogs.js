@@ -22,12 +22,19 @@ router.post('/', requireAuthenticatedUser, async (request, response) => {
 });
 
 router.delete('/:id', requireAuthenticatedUser, async (request, response) => {
-    const blog = await Blog.findByIdAndDelete(request.params.id);
-    if (blog) {
-        response.json(blog);
-    } else {
-        response.status(404).end();
+    const blog = await Blog.findById(request.params.id);
+    if (!blog) {
+        return response.status(404).end();
     }
+
+    if (!blog.user.equals(request.user._id)) {
+        return response.status(403).json({
+            error: 'only owner can delete blog',
+        });
+    }
+
+    await blog.delete();
+    response.json(blog);
 });
 
 router.patch('/:id', requireAuthenticatedUser, async (request, response) => {

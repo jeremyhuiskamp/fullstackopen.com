@@ -205,6 +205,30 @@ describe('blog deletion', () => {
             .delete('/api/blogs/' + savedBlogs[0].id)
             .expect(401);
     });
+
+    test('only user who created blog can delete it', async () => {
+        const anotherUser = await new User({
+            username: 'user2',
+            name: 'user number2',
+            passwordHash: 'sekret',
+        }).save();
+
+        const anotherToken = jwt.sign({
+            username: anotherUser.username,
+            id: anotherUser._id.toString(),
+        }, process.env.SECRET);
+
+        const savedBlogs =
+            (await api
+                .get('/api/blogs')
+                .expect(200)
+            ).body;
+
+        await api
+            .delete('/api/blogs/' + savedBlogs[0].id)
+            .set('authorization', 'bearer ' + anotherToken)
+            .expect(403);
+    });
 });
 
 describe('blog updating', () => {
