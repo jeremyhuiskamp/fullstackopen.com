@@ -3,16 +3,19 @@ import './App.css';
 import blogService from './services/blogs';
 import Blog from './components/Blog';
 import Login from './components/Login';
+import BlogCreator from './components/BlogCreator';
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
     const [user, setUser] = useState(null);
 
-    useEffect(() => {
+    const reloadBlogs = () => {
         blogService.getAll().then(blogs => {
             setBlogs(blogs);
         });
-    }, []);
+    };
+
+    useEffect(reloadBlogs, []);
 
     return <>
         <h1>{user ?
@@ -20,9 +23,12 @@ const App = () => {
             'You must log in to see my blogs.'}</h1>
         <Login user={user} setUser={setUser} />
         {user &&
-            <ul>
-                {blogs.map(blog => <li key={blog.id}><Blog blog={blog} /></li>)}
-            </ul>}
+            <>
+                <BlogCreator user={user} onBlogCreated={reloadBlogs} />
+                <ul>
+                    {blogs.map(blog => <li key={blog.id}><Blog blog={blog} /></li>)}
+                </ul>
+            </>}
     </>;
 };
 
