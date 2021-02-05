@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import blogService from '../services/blogs';
 
-const BlogCreator = ({ user, onBlogCreated }) => {
+const BlogCreator = ({ user, onBlogCreated, notify }) => {
     const [title, setTitle] = useState('');
     const [author, setAuthor] = useState('');
     const [url, setUrl] = useState('https://');
@@ -12,13 +12,18 @@ const BlogCreator = ({ user, onBlogCreated }) => {
     const submit = async (e) => {
         e.preventDefault();
 
-        if (title.trim() === '' || author.trim() === '' || url.trim() === '') {
-            // TODO: some kind of fancy validation and alerting system...
+        try {
+            await blogService.create(title, author, url, user);
+        } catch (e) {
+            blogService.ifBadRequest(e, (msg) => {
+                notify.error(msg);
+            }, () => {
+                throw e;
+            });
             return;
         }
 
-        // TODO: catch the 400 error for an invalid submission
-        await blogService.create(title, author, url, user);
+        notify.msg(`new blog "${title}" by "${author}" added`);
 
         setTitle('');
         setAuthor('');

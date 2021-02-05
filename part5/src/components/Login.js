@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import loginService from '../services/login';
 
-const Login = ({ user, setUser }) => {
+const Login = ({ user, setUser, notify }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-    const [errMsg, setErrMsg] = useState(null);
 
     // Check local storage for existing user and register listener for future
     // changes:
@@ -47,11 +46,11 @@ const Login = ({ user, setUser }) => {
             setUser(await loginService.login(username, password));
             setUsername('');
             setPassword('');
-            setErrMsg(null);
             console.log('logged in');
+            notify.clear();
         } catch (e) {
             console.log(e.response?.data?.error ?? e);
-            setErrMsg(`login failed: ${e.response?.data?.error}`);
+            notify.error(`login failed: ${e.response?.data?.error}`);
         }
     };
 
@@ -64,7 +63,6 @@ const Login = ({ user, setUser }) => {
     }
 
     return <div>
-        {errMsg && <div className="error">{errMsg}</div>}
         <form onSubmit={tryLogin}>
             <div>
                 Username:

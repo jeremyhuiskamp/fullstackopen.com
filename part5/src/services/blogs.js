@@ -14,7 +14,17 @@ const create = async (title, author, url, user) =>
         },
     });
 
+const ifBadRequest = (e, onBadRequest, otherwise) => {
+    if (e.response?.status / 100 === 4) {
+        onBadRequest(e.response?.data?.error);
+    } else {
+        otherwise(e);
+    }
+};
+
 const exports = {
-    getAll, create,
+    getAll,
+    create,
+    ifBadRequest,
 };
 export default exports;
