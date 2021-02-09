@@ -60,9 +60,7 @@ const App = () => {
                 <Toggle buttonLabel="new blog" ref={toggleRef}>
                     <BlogCreator user={user} onBlogCreated={onBlogCreated} notify={notify} />
                 </Toggle>
-                <ul>
-                    {blogs.map(blog => <li key={blog.id}><Blog blog={blog} /></li>)}
-                </ul>
+                {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
             </>}
     </>;
 };
