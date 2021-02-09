@@ -1,15 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import './App.css';
 import blogService from './services/blogs';
 import Blog from './components/Blog';
 import Login from './components/Login';
 import BlogCreator from './components/BlogCreator';
 import Notification from './components/Notification';
+import Toggle from './components/Toggle';
 
 const App = () => {
     const [blogs, setBlogs] = useState([]);
     const [user, setUser] = useState(null);
     const [notification, setNotification] = useState(null);
+    const toggleRef = useRef();
 
     // lower-level notification state setter:
     const doNotify = (msg, isError = false) => {
@@ -39,6 +41,11 @@ const App = () => {
 
     useEffect(reloadBlogs, []);
 
+    const onBlogCreated = () => {
+        toggleRef.current.hide();
+        reloadBlogs();
+    };
+
     return <>
         <h1>{user ?
             'Hello. Here are my blogs.' :
@@ -50,7 +57,9 @@ const App = () => {
 
         {user &&
             <>
-                <BlogCreator user={user} onBlogCreated={reloadBlogs} notify={notify} />
+                <Toggle buttonLabel="new blog" ref={toggleRef}>
+                    <BlogCreator user={user} onBlogCreated={onBlogCreated} notify={notify} />
+                </Toggle>
                 <ul>
                     {blogs.map(blog => <li key={blog.id}><Blog blog={blog} /></li>)}
                 </ul>
