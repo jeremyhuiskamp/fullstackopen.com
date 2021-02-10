@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const Blog = ({ blog: { id, title, author, url, likes, user } }) => {
+const Blog = ({ blog: { id, title, author, url, likes, user }, like }) => {
     const [expanded, setExpanded] = useState(false);
 
     const blogStyle = {
@@ -10,9 +10,9 @@ const Blog = ({ blog: { id, title, author, url, likes, user } }) => {
         cursor: 'pointer',
     };
 
-    const like = (e) => {
+    const doLike = e => {
         e.stopPropagation();
-        console.log(`you liked ${id}`);
+        like(id);
     };
 
     return <div style={blogStyle} onClick={() => setExpanded(!expanded)}>
@@ -21,7 +21,7 @@ const Blog = ({ blog: { id, title, author, url, likes, user } }) => {
             <>
                 ▼
                 <br />
-                {likes} <span onClick={like}>👍</span>
+                {likes} <span onClick={doLike}>👍</span>
                 <br />
                 added by: {user.username}
             </>

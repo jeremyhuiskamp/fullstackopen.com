@@ -14,6 +14,15 @@ const create = async (title, author, url, user) =>
         },
     });
 
+const like = async (id, likes, user) =>
+    await axios.patch(baseURL + '/' + id, {
+        likes
+    }, {
+        headers: {
+            authorization: `bearer ${user.token}`,
+        },
+    });
+
 const ifBadRequest = (e, onBadRequest, otherwise) => {
     if (e.response?.status / 100 === 4) {
         onBadRequest(e.response?.data?.error);
@@ -25,6 +34,7 @@ const ifBadRequest = (e, onBadRequest, otherwise) => {
 const exports = {
     getAll,
     create,
+    like,
     ifBadRequest,
 };
 export default exports;

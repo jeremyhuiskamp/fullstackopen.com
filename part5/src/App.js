@@ -46,6 +46,21 @@ const App = () => {
         reloadBlogs();
     };
 
+    const like = (blogId) => {
+        const blog = blogs.find(b => b.id === blogId);
+        if (!blog) {
+            return;
+        }
+        blogService.like(blogId, blog.likes + 1, user).then(() => {
+            setBlogs(blogs.map(blog => {
+                if (blog.id === blogId) {
+                    return { ...blog, likes: blog.likes + 1 };
+                }
+                return blog;
+            }));
+        });
+    };
+
     return <>
         <h1>{user ?
             'Hello. Here are my blogs.' :
@@ -60,7 +75,7 @@ const App = () => {
                 <Toggle buttonLabel="new blog" ref={toggleRef}>
                     <BlogCreator user={user} onBlogCreated={onBlogCreated} notify={notify} />
                 </Toggle>
-                {blogs.map(blog => <Blog key={blog.id} blog={blog} />)}
+                {blogs.map(blog => <Blog key={blog.id} blog={blog} like={like} />)}
             </>}
     </>;
 };
