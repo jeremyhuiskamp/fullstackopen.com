@@ -8,7 +8,10 @@ import Notification from './components/Notification';
 import Toggle from './components/Toggle';
 
 const App = () => {
-    const [blogs, setBlogs] = useState([]);
+    const [blogs, _setBlogs] = useState([]);
+    const setBlogs = blogs =>
+        _setBlogs(blogs.sort((a, b) => b.likes - a.likes));
+
     const [user, setUser] = useState(null);
     const [notification, setNotification] = useState(null);
     const toggleRef = useRef();
