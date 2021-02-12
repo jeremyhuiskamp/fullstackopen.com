@@ -49,18 +49,23 @@ const App = () => {
         reloadBlogs();
     };
 
-    const like = (blogId) => {
-        const blog = blogs.find(b => b.id === blogId);
-        if (!blog) {
+    const like = blog => {
+        blogService.like(blog.id, blog.likes + 1, user).then(() => {
+            setBlogs(blogs.map(b => {
+                if (b.id === blog.id) {
+                    return { ...b, likes: b.likes + 1 };
+                }
+                return b;
+            }));
+        });
+    };
+
+    const remove = blog => {
+        if (!window.confirm(`Are you sure you want to delete "${blog.title}" by ${blog.author}?`)) {
             return;
         }
-        blogService.like(blogId, blog.likes + 1, user).then(() => {
-            setBlogs(blogs.map(blog => {
-                if (blog.id === blogId) {
-                    return { ...blog, likes: blog.likes + 1 };
-                }
-                return blog;
-            }));
+        blogService.remove(blog.id, user).then(() => {
+            setBlogs(blogs.filter(b => b.id !== blog.id));
         });
     };
 
@@ -78,7 +83,14 @@ const App = () => {
                 <Toggle buttonLabel="new blog" ref={toggleRef}>
                     <BlogCreator user={user} onBlogCreated={onBlogCreated} notify={notify} />
                 </Toggle>
-                {blogs.map(blog => <Blog key={blog.id} blog={blog} like={like} />)}
+
+                {blogs.map(blog =>
+                    <Blog
+                        key={blog.id}
+                        blog={blog}
+                        like={like}
+                        remove={blog.user.username === user.username && remove} />)
+                }
             </>}
     </>;
 };

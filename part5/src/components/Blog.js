@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 
-const Blog = ({ blog: { id, title, author, url, likes, user }, like }) => {
+const Blog = ({ blog, like, remove }) => {
     const [expanded, setExpanded] = useState(false);
+
+    const { title, author, url, likes, user: { username } } = blog;
 
     const blogStyle = {
         padding: 10,
@@ -10,9 +12,11 @@ const Blog = ({ blog: { id, title, author, url, likes, user }, like }) => {
         cursor: 'pointer',
     };
 
-    const doLike = e => {
-        e.stopPropagation();
-        like(id);
+    const blockEventPropagation = f => {
+        return e => {
+            e.stopPropagation();
+            f(blog);
+        };
     };
 
     return <div style={blogStyle} onClick={() => setExpanded(!expanded)}>
@@ -21,9 +25,13 @@ const Blog = ({ blog: { id, title, author, url, likes, user }, like }) => {
             <>
                 ▼
                 <br />
-                {likes} <span onClick={doLike}>👍</span>
+                {likes} <span onClick={blockEventPropagation(like)}>👍</span>
                 <br />
-                added by: {user.username}
+                added by: {username}
+                {remove && <>
+                    <br />
+                    <button onClick={blockEventPropagation(remove)}>remove</button>
+                </>}
             </>
             : <>►</>
         }

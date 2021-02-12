@@ -14,6 +14,13 @@ const create = async (title, author, url, user) =>
         },
     });
 
+const remove = async (id, user) =>
+    await axios.delete(baseURL + '/' + id, {
+        headers: {
+            authorization: `bearer ${user.token}`,
+        },
+    });
+
 const like = async (id, likes, user) =>
     await axios.patch(baseURL + '/' + id, {
         likes
@@ -34,6 +41,7 @@ const ifBadRequest = (e, onBadRequest, otherwise) => {
 const exports = {
     getAll,
     create,
+    remove,
     like,
     ifBadRequest,
 };
