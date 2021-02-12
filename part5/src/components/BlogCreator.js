@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import blogService from '../services/blogs';
 
 const BlogCreator = ({ user, onBlogCreated, notify }) => {
@@ -53,6 +54,15 @@ const BlogCreator = ({ user, onBlogCreated, notify }) => {
             <button type="submit">submit</button>
         </form>
     </div >;
+};
+
+BlogCreator.propTypes = {
+    user: PropTypes.object.isRequired, // TODO: tighten?
+    onBlogCreated: PropTypes.func.isRequired,
+    notify: PropTypes.shape({
+        error: PropTypes.func.isRequired,
+        msg: PropTypes.func.isRequired,
+    }),
 };
 
 export default BlogCreator;

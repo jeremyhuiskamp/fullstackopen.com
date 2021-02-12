@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const Blog = ({ blog, like, remove }) => {
     const [expanded, setExpanded] = useState(false);
@@ -36,6 +37,20 @@ const Blog = ({ blog, like, remove }) => {
             : <>►</>
         }
     </div>;
+};
+
+Blog.propTypes = {
+    blog: PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        author: PropTypes.string.isRequired,
+        url: PropTypes.string.isRequired,
+        likes: PropTypes.number.isRequired,
+        user: PropTypes.shape({
+            username: PropTypes.string.isRequired,
+        }),
+    }).isRequired,
+    like: PropTypes.func.isRequired,
+    remove: PropTypes.func,
 };
 
 export default Blog;
