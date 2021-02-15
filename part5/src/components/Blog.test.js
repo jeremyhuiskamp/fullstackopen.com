@@ -3,7 +3,7 @@ import '@testing-library/jest-dom/extend-expect';
 import { render, fireEvent } from '@testing-library/react';
 import Blog from './Blog';
 
-test('renders only title and author by default', () => {
+describe('blog component', () => {
     const blog = {
         title: 'title1',
         author: 'author1',
@@ -14,38 +14,48 @@ test('renders only title and author by default', () => {
         },
     };
 
-    const component = render(
-        <Blog blog={blog} like={() => { }} remove={() => { }} />
-    );
+    let likeHandler,
+        removeHandler,
+        component;
 
-    expect(component.container).toHaveTextContent('title1');
-    expect(component.container).toHaveTextContent('author1');
-    expect(component.container).not.toHaveTextContent('user1');
-    expect(component.container).not.toHaveTextContent('2 👍');
-});
+    beforeEach(() => {
+        likeHandler = jest.fn();
+        removeHandler = jest.fn();
+        component = render(
+            <Blog blog={blog} like={likeHandler} remove={removeHandler} />
+        );
+    });
 
-test('renders likes and user when expanded', () => {
-    const blog = {
-        title: 'title1',
-        author: 'author1',
-        url: 'url1',
-        likes: 2,
-        user: {
-            username: 'user1',
-        },
-    };
+    test('renders only title and author by default', () => {
+        expect(likeHandler.mock.calls).toHaveLength(0);
+        expect(removeHandler.mock.calls).toHaveLength(0);
 
-    const handler = jest.fn();
+        expect(component.container).toHaveTextContent('title1');
+        expect(component.container).toHaveTextContent('author1');
+        expect(component.container).not.toHaveTextContent('user1');
+        expect(component.container).not.toHaveTextContent('2 👍');
+    });
 
-    const component = render(
-        <Blog blog={blog} like={handler} remove={handler} />
-    );
+    test('renders likes and user when expanded', () => {
+        fireEvent.click(component.container.firstChild);
+        expect(likeHandler.mock.calls).toHaveLength(0);
+        expect(removeHandler.mock.calls).toHaveLength(0);
 
-    fireEvent.click(component.container.firstChild);
-    expect(handler.mock.calls).toHaveLength(0);
+        expect(component.container).toHaveTextContent('title1');
+        expect(component.container).toHaveTextContent('author1');
+        expect(component.container).toHaveTextContent('user1');
+        expect(component.container).toHaveTextContent('2 👍');
+    });
 
-    expect(component.container).toHaveTextContent('title1');
-    expect(component.container).toHaveTextContent('author1');
-    expect(component.container).toHaveTextContent('user1');
-    expect(component.container).toHaveTextContent('2 👍');
+    test('like callback called when like clicked', async () => {
+        fireEvent.click(component.container.firstChild);
+        fireEvent.click(await component.findByText('👍'));
+        fireEvent.click(await component.findByText('👍'));
+
+        expect(likeHandler.mock.calls).toHaveLength(2);
+        likeHandler.mock.calls.forEach(c => {
+            expect(c).toMatchObject([blog]);
+        });
+        expect(removeHandler.mock.calls).toHaveLength(0);
+    });
 });
