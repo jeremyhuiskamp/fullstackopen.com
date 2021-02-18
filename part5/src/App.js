@@ -44,8 +44,23 @@ const App = () => {
 
     useEffect(reloadBlogs, []);
 
-    const onBlogCreated = () => {
+    const createBlog = async (title, author, url) => {
+        try {
+            await blogService.create(title, author, url, user);
+        } catch (e) {
+            blogService.ifBadRequest(e, (msg) => {
+                notify.error(msg);
+            }, () => {
+                throw e;
+            });
+            return;
+        }
+
+        notify.msg(`new blog "${title}" by "${author}" added`);
+
         toggleRef.current.hide();
+        // don't just add the blog returned from the create call because it
+        // doesn't populate the user the same as the get...
         reloadBlogs();
     };
 
@@ -81,7 +96,7 @@ const App = () => {
         {user &&
             <>
                 <Toggle buttonLabel="new blog" ref={toggleRef}>
-                    <BlogCreator user={user} onBlogCreated={onBlogCreated} notify={notify} />
+                    <BlogCreator createBlog={createBlog} />
                 </Toggle>
 
                 {blogs.map(blog =>
