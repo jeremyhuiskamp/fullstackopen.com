@@ -69,6 +69,7 @@ const Login = ({ user, setUser, notify }) => {
                 Username:
                 &nbsp;
                 <input
+                    id="username"
                     type="text"
                     value={username}
                     name="Username"
@@ -78,12 +79,13 @@ const Login = ({ user, setUser, notify }) => {
                 Password:
                 &nbsp;
                 <input
+                    id="password"
                     type="password"
                     value={password}
                     name="Password"
                     onChange={(e) => setPassword(e.target.value)}></input>
             </div>
-            <button type="submit">login</button>
+            <button type="submit" id="login">login</button>
         </form>
     </div>;
 };

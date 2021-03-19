@@ -104,7 +104,7 @@ const App = () => {
                         key={blog.id}
                         blog={blog}
                         like={like}
-                        remove={blog.user.username === user.username ? remove : undefined} />)
+                        remove={blog.user?.username === user.username ? remove : undefined} />)
                 }
             </>}
     </>;
