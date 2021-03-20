@@ -71,5 +71,34 @@ describe('Blog app', function () {
                 cy.get('@blog').should('not.contain', 'remove');
             });
         });
+
+        it('multiple blogs are ordered by likes', function () {
+            cy.createBlog('title1', 'author1', 'url1').then(blog => {
+                cy.likeBlog(blog.id, 7);
+            });
+            cy.createBlog('title2', 'author2', 'url2').then(blog => {
+                cy.likeBlog(blog.id, 4);
+            });
+            cy.createBlog('title3', 'author3', 'url3').then(blog => {
+                cy.likeBlog(blog.id, 10);
+            });
+            cy.createBlog('title4', 'author4', 'url4').then(blog => {
+                cy.likeBlog(blog.id, 2);
+            });
+
+            cy.visit('http://localhost:3000');
+
+            cy.get('#blogs').get('.blog').then(blogs => {
+                const titles = blogs.map((_, blog) =>
+                    Cypress.$(blog).find('a:first').text()).get();
+
+                expect(titles).to.have.ordered.members([
+                    'title3',
+                    'title1',
+                    'title2',
+                    'title4',
+                ]);
+            });
+        });
     });
 });
