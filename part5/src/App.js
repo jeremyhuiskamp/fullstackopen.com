@@ -99,13 +99,15 @@ const App = () => {
                     <BlogCreator createBlog={createBlog} />
                 </Toggle>
 
-                {blogs.map(blog =>
-                    <Blog
-                        key={blog.id}
-                        blog={blog}
-                        like={like}
-                        remove={blog.user?.username === user.username ? remove : undefined} />)
-                }
+                <div id="blogs">
+                    {blogs.map(blog =>
+                        <Blog
+                            key={blog.id}
+                            blog={blog}
+                            like={like}
+                            remove={blog.user?.username === user.username ? remove : undefined} />)
+                    }
+                </div>
             </>}
     </>;
 };
