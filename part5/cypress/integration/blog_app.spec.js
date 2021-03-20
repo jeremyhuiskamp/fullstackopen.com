@@ -55,5 +55,18 @@ describe('Blog app', function () {
                 .should('contain', 'blog title')
                 .and('contain', 'blog author');
         });
+
+        describe('When a blog post exists', function () {
+            beforeEach(function () {
+                cy.createBlog('title1', 'author1', 'http://url1');
+            });
+
+            it('blog can be liked', function () {
+                // unfold the blog:
+                cy.get('#blogs').contains('author1').click();
+                cy.get('#blogs').contains('👍').click();
+                cy.get('#blogs').contains('1 👍');
+            });
+        });
     });
 });
