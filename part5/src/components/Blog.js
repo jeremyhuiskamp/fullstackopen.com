@@ -20,7 +20,7 @@ const Blog = ({ blog, like, remove }) => {
         };
     };
 
-    return <div style={blogStyle} onClick={() => setExpanded(!expanded)}>
+    return <div className='blog' style={blogStyle} onClick={() => setExpanded(!expanded)}>
         &quot;<a href={url} onClick={(e) => e.stopPropagation()}>{title}</a>&quot; by <b> {author}</b>&nbsp;
         {expanded ?
             <>

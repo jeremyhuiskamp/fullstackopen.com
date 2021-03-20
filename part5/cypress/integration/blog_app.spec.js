@@ -1,11 +1,7 @@
 describe('Blog app', function () {
     beforeEach(function () {
         cy.request('POST', 'http://localhost:3001/api/testing/reset');
-        cy.request('POST', 'http://localhost:3001/api/users', {
-            name: 'root',
-            username: 'root',
-            password: 'sekret',
-        });
+        cy.createUser('root', 'root', 'sekret');
         cy.visit('http://localhost:3000');
     });
 
@@ -34,14 +30,7 @@ describe('Blog app', function () {
 
     describe('When logged in', function () {
         beforeEach(function () {
-            cy.request('POST', 'http://localhost:3001/api/login', {
-                username: 'root',
-                password: 'sekret',
-            }).then(rsp => {
-                localStorage.setItem('loggedInUser', JSON.stringify(rsp.body));
-                cy.visit('http://localhost:3000');
-                cy.contains('Here are my blogs');
-            });
+            cy.login('root', 'sekret');
         });
 
         it('A blog can be created', function () {
@@ -59,13 +48,27 @@ describe('Blog app', function () {
         describe('When a blog post exists', function () {
             beforeEach(function () {
                 cy.createBlog('title1', 'author1', 'http://url1');
+                cy.get('#blogs').contains('author1').parent('.blog').as('blog');
             });
 
             it('blog can be liked', function () {
-                // unfold the blog:
-                cy.get('#blogs').contains('author1').click();
-                cy.get('#blogs').contains('👍').click();
-                cy.get('#blogs').contains('1 👍');
+                cy.get('@blog').click(); // expand details
+                cy.get('@blog').contains('👍').click();
+                cy.get('@blog').contains('1 👍');
+            });
+
+            it('blog can be deleted by creator', function () {
+                cy.get('@blog').click(); // expand details
+                cy.get('@blog').contains('remove').click();
+                cy.get('#blogs').should('be.empty');
+            });
+
+            it('blog cannot be deleted by different user', function () {
+                cy.createUser('the other admin', 'root2', 'zekret');
+                cy.login('root2', 'zekret');
+
+                cy.get('@blog').click(); // expand details
+                cy.get('@blog').should('not.contain', 'remove');
             });
         });
     });
