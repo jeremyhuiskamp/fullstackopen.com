@@ -6,19 +6,21 @@ import reducer from './reducer';
 const store = createStore(reducer);
 
 const App = () => {
-    const good = () => {
-        store.dispatch({
-            type: 'GOOD',
-        });
+    const dispatcher = (type) => {
+        return () => {
+            store.dispatch({
+                type: type,
+            });
+        };
     };
     return <>
-        <button onClick={good}>good</button>
-        <button>neutral</button>
-        <button>bad</button>
-        <button>reset stats</button>
+        <button onClick={dispatcher('GOOD')}>good</button>
+        <button onClick={dispatcher('OK')}>neutral</button>
+        <button onClick={dispatcher('BAD')}>bad</button>
+        <button onClick={dispatcher('ZERO')}>reset stats</button>
         <p>good {store.getState().good}</p>
-        <p>neutral</p>
-        <p>bad</p>
+        <p>neutral {store.getState().ok}</p>
+        <p>bad {store.getState().bad}</p>
     </>;
 };
 
@@ -27,7 +29,7 @@ const renderApp = () => {
         <React.StrictMode>
             <App />
         </React.StrictMode>,
-        document.getElementById('root')
+        document.getElementById('root'),
     );
 };
 
