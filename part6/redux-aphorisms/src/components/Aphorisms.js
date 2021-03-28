@@ -7,8 +7,10 @@ const Aphorisms = () => {
     const aphorisms = useSelector(state => state);
     const dispatch = useDispatch();
 
+    const sortedAphorisms = aphorisms.slice().sort((a, b) => b.votes - a.votes);
+
     return <div>
-        {aphorisms.map(aphorism =>
+        {sortedAphorisms.map(aphorism =>
             <Aphorism
                 key={aphorism.id}
                 aphorism={aphorism}
