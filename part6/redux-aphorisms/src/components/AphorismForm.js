@@ -3,7 +3,7 @@ import React from 'react';
 import { useDispatch } from 'react-redux';
 import { createAphorism } from '../reducers/aphorismReducer';
 
-const AphorismCreator = () => {
+const AphorismForm = () => {
     const dispatch = useDispatch();
 
     const submit = (e) => {
@@ -19,4 +19,4 @@ const AphorismCreator = () => {
     </form>;
 };
 
-export default AphorismCreator;
+export default AphorismForm;
