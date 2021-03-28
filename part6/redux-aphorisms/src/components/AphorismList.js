@@ -3,7 +3,7 @@ import Aphorism from './Aphorism';
 import { useSelector, useDispatch } from 'react-redux';
 import { voteForAphorism } from '../reducers/aphorismReducer';
 
-const Aphorisms = () => {
+const AphorismList = () => {
     const aphorisms = useSelector(state => state);
     const dispatch = useDispatch();
 
@@ -19,4 +19,4 @@ const Aphorisms = () => {
     </div>;
 };
 
-export default Aphorisms;
+export default AphorismList;

@@ -1,11 +1,11 @@
 import React from 'react';
-import Aphorisms from './components/Aphorisms';
+import AphorismList from './components/AphorismList';
 import AphorismForm from './components/AphorismForm';
 
 const App = () => {
     return <>
         <h2>Aphorisms</h2>
-        <Aphorisms />
+        <AphorismList />
         <h2>Create New</h2>
         <AphorismForm />
     </>;
