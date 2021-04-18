@@ -2,18 +2,19 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import AphorismList from './AphorismList';
 import { createStore } from 'redux';
-import { reducer, createAphorism } from '../reducers/aphorismReducer';
+import { createAphorism } from '../reducers/aphorismReducer';
+import { reducer } from '../store';
 import { render } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 
 test('emtpy state means no aphorisms', () => {
-    const store = createStore(reducer, []);
+    const store = createStore(reducer, { aphorisms: [] });
     const component = render(<Provider store={store}><AphorismList /></Provider>);
     expect(component.queryAllByText('vote')).toHaveLength(0);
 });
 
 test('render one aphorism', () => {
-    const store = createStore(reducer, []);
+    const store = createStore(reducer, { aphorisms: [] });
     store.dispatch(createAphorism('aphorism1'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
 
@@ -21,7 +22,7 @@ test('render one aphorism', () => {
 });
 
 test('vote for one aphorism', () => {
-    const store = createStore(reducer, []);
+    const store = createStore(reducer, { aphorisms: [] });
     store.dispatch(createAphorism('aphorism1'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
 
@@ -31,7 +32,7 @@ test('vote for one aphorism', () => {
 });
 
 test('aphorisms are sorted by votes', () => {
-    const store = createStore(reducer, []);
+    const store = createStore(reducer, { aphorisms: [] });
     store.dispatch(createAphorism('aphorism1'));
     store.dispatch(createAphorism('aphorism2'));
     store.dispatch(createAphorism('aphorism3'));

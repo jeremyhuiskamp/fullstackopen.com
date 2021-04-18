@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { voteForAphorism } from '../reducers/aphorismReducer';
 
 const AphorismList = () => {
-    const aphorisms = useSelector(state => state);
+    const aphorisms = useSelector(state => state.aphorisms);
     const dispatch = useDispatch();
 
     const sortedAphorisms = aphorisms.slice().sort((a, b) => b.votes - a.votes);
