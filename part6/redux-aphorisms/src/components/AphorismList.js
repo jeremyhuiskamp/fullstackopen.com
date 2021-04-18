@@ -11,11 +11,14 @@ const AphorismList = () => {
 
     return <div>
         {sortedAphorisms.map(aphorism =>
-            <Aphorism
-                key={aphorism.id}
-                aphorism={aphorism}
-                vote={() => dispatch(voteForAphorism(aphorism.id))} />
+            <div key={aphorism.id}>
+                <hr />
+                <Aphorism
+                    aphorism={aphorism}
+                    vote={() => dispatch(voteForAphorism(aphorism.id))} />
+            </div>
         )}
+        <hr />
     </div>;
 };
 
