@@ -22,7 +22,7 @@ describe('Notification component', () => {
             notification: {},
             aphorisms: [],
         });
-        store.dispatch(setErrorNotification('error!'));
+        store.dispatch(setErrorNotification('error!').action);
         const component = render(<Provider store={store}><Notification /></Provider>);
         const notification = component.getByTestId('notification');
         expect(notification.textContent).toContain('error!');
@@ -35,7 +35,7 @@ describe('Notification component', () => {
             notification: {},
             aphorisms: [],
         });
-        store.dispatch(setInfoNotification('info!'));
+        store.dispatch(setInfoNotification('info!').action);
         const component = render(<Provider store={store}><Notification /></Provider>);
         const notification = component.getByTestId('notification');
         expect(notification.textContent).toContain('info!');

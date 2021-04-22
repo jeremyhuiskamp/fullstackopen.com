@@ -5,8 +5,8 @@ import Notification from './components/Notification';
 
 const App = () => {
     return <>
-        <Notification />
         <h2>Aphorisms</h2>
+        <Notification />
         <AphorismList />
         <h2>Create New</h2>
         <AphorismForm />

@@ -1,35 +1,53 @@
+const uuid = require('uuid');
+
 const reducer = (state, action) => {
     switch (action?.type) {
         case 'SET_NOTIFICATION':
             return {
                 [action.data.level]: action.data.msg,
+                clearToken: action.data.clearToken,
             };
         case 'CLEAR_NOTIFICATION':
-            return {};
+            if (action.data?.clearToken === undefined || action.data?.clearToken === state?.clearToken) {
+                return {};
+            }
     }
     return state ?? {};
 };
 
-const setInfoNotification = msg => ({
-    type: 'SET_NOTIFICATION',
-    data: {
-        level: 'info',
-        msg: msg,
-    }
-});
+const setInfoNotification = msg => setNotification(msg, 'info');
 
-const setErrorNotification = msg => ({
-    type: 'SET_NOTIFICATION',
-    data: {
-        level: 'error',
-        msg: msg,
-    }
-});
+const setErrorNotification = msg => setNotification(msg, 'error');
 
-const clearNotification = () => ({
+// setNotification creates two actions: one to set the current notification
+// message, and one to clear the notification.  The two are linked, so that
+// firing the clearing action has no effect if the message has been subsequently
+// overwritten.
+const setNotification = (msg, level) => {
+    const clearToken = uuid.v4();
+    const clearAction = clearNotification(clearToken);
+    const action = {
+        type: 'SET_NOTIFICATION',
+        data: {
+            level: level,
+            msg: msg,
+            clearToken: clearToken,
+        },
+    };
+
+    return { action, clearAction };
+};
+
+const clearNotification = clearToken => ({
     type: 'CLEAR_NOTIFICATION',
-    // TODO: some token to allow us to detect and ignore clearings that have
-    // been delayed and superceded?
+    data: {
+        clearToken,
+    },
 });
 
-module.exports = { reducer, setInfoNotification, setErrorNotification, clearNotification };
+module.exports = {
+    reducer,
+    setInfoNotification,
+    setErrorNotification,
+    clearNotification,
+};

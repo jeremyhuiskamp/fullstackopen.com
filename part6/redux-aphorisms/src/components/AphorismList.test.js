@@ -48,3 +48,89 @@ test('aphorisms are sorted by votes', () => {
     const sortedAphorisms = component.getAllByText(/aphorism[0-9]/).map(p => p.innerHTML);
     expect(sortedAphorisms).toEqual(['aphorism2', 'aphorism3', 'aphorism1']);
 });
+
+test('voting for aphorism sets info notification', () => {
+    const store = createStore(reducer, {
+        aphorisms: [],
+        notification: {},
+    });
+    store.dispatch(createAphorism('aphorism1'));
+    const component = render(<Provider store={store}><AphorismList /></Provider>);
+    const voteFor = (aphorism) => {
+        within(component.getByText(aphorism).parentElement).getByText('vote').click();
+    };
+    voteFor('aphorism1');
+
+    expect(store.getState().notification).toMatchObject({
+        info: 'you voted for "aphorism1"',
+    });
+});
+
+describe('clearing voting notification', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+    });
+
+    test('notification is cleared after 5s', () => {
+        const store = createStore(reducer, {
+            aphorisms: [],
+            notification: {},
+        });
+        store.dispatch(createAphorism('aphorism1'));
+        const component = render(<Provider store={store}><AphorismList /></Provider>);
+        const voteFor = (aphorism) => {
+            within(component.getByText(aphorism).parentElement).getByText('vote').click();
+        };
+        voteFor('aphorism1');
+
+        expect(store.getState().notification).toMatchObject({
+            info: 'you voted for "aphorism1"',
+        });
+
+        jest.advanceTimersByTime(5000);
+        expect(store.getState().notification?.info).not.toBeDefined();
+        expect(store.getState().notification?.error).not.toBeDefined();
+    });
+
+    test('clearing old notification doesn\'t clear new one', () => {
+        const store = createStore(reducer, {
+            aphorisms: [],
+            notification: {},
+        });
+        store.dispatch(createAphorism('aphorism1'));
+        store.dispatch(createAphorism('aphorism2'));
+        const component = render(<Provider store={store}><AphorismList /></Provider>);
+        const voteFor = (aphorism) => {
+            within(component.getByText(aphorism).parentElement).getByText('vote').click();
+        };
+        voteFor('aphorism1');
+
+        expect(store.getState().notification).toMatchObject({
+            info: 'you voted for "aphorism1"',
+        });
+
+        jest.advanceTimersByTime(3000);
+        expect(store.getState().notification).toMatchObject({
+            info: 'you voted for "aphorism1"',
+        });
+
+        voteFor('aphorism2');
+        expect(store.getState().notification).toMatchObject({
+            info: 'you voted for "aphorism2"',
+        });
+
+        jest.advanceTimersByTime(3000);
+        expect(store.getState().notification).toMatchObject({
+            info: 'you voted for "aphorism2"',
+        });
+
+        jest.advanceTimersByTime(3000);
+        expect(store.getState().notification?.info).not.toBeDefined();
+        expect(store.getState().notification?.error).not.toBeDefined();
+    });
+});
