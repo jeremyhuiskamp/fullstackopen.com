@@ -5,10 +5,14 @@ import { voteForAphorism } from '../reducers/aphorismReducer';
 import { setInfoNotification } from '../reducers/notificationReducer';
 
 const AphorismList = () => {
-    const aphorisms = useSelector(state => state.aphorisms);
+    const { aphorisms, filter = '' } = useSelector(
+        ({ aphorisms, filter: { filter } }) => ({
+            aphorisms, filter,
+        }));
     const dispatch = useDispatch();
 
-    const sortedAphorisms = aphorisms.slice().sort((a, b) => b.votes - a.votes);
+    const filteredAphorisms = aphorisms.filter(a => a.content.includes(filter));
+    const sortedAphorisms = filteredAphorisms.slice().sort((a, b) => b.votes - a.votes);
 
     const vote = (aphorism) => {
         dispatch(voteForAphorism(aphorism.id));

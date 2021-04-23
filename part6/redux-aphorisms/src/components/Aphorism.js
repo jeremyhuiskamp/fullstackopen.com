@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const Aphorism = ({ aphorism, vote }) => {
     return <div>
-        <p>{aphorism.content}</p>
+        <p data-testid='aphorism-content'>{aphorism.content}</p>
         <p>
             has {aphorism.votes}&nbsp;
             <button onClick={vote}>vote</button>

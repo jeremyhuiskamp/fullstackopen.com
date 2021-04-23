@@ -3,6 +3,7 @@ import { Provider } from 'react-redux';
 import AphorismList from './AphorismList';
 import { createStore } from 'redux';
 import { createAphorism } from '../reducers/aphorismReducer';
+import { updateFilter } from '../reducers/filterReducer';
 import { reducer } from '../store';
 import { render } from '@testing-library/react';
 import { within } from '@testing-library/dom';
@@ -45,7 +46,7 @@ test('aphorisms are sorted by votes', () => {
     voteFor('aphorism2');
     voteFor('aphorism3');
 
-    const sortedAphorisms = component.getAllByText(/aphorism[0-9]/).map(p => p.innerHTML);
+    const sortedAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
     expect(sortedAphorisms).toEqual(['aphorism2', 'aphorism3', 'aphorism1']);
 });
 
@@ -132,5 +133,30 @@ describe('clearing voting notification', () => {
         jest.advanceTimersByTime(3000);
         expect(store.getState().notification?.info).not.toBeDefined();
         expect(store.getState().notification?.error).not.toBeDefined();
+    });
+});
+
+describe('filtering aphorisms', () => {
+    test('empty filter', () => {
+        const store = createStore(reducer, { aphorisms: [], filter: {} });
+        store.dispatch(createAphorism('aphorism1'));
+        store.dispatch(createAphorism('aphorism2'));
+        store.dispatch(createAphorism('aphorism3'));
+        const component = render(<Provider store={store}><AphorismList /></Provider>);
+
+        const filteredAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
+        expect(filteredAphorisms).toEqual(['aphorism1', 'aphorism2', 'aphorism3']);
+    });
+
+    test('non-empty filter', () => {
+        const store = createStore(reducer, { aphorisms: [], filter: {} });
+        store.dispatch(createAphorism('a'));
+        store.dispatch(createAphorism('ap'));
+        store.dispatch(createAphorism('aph'));
+        store.dispatch(updateFilter('ap'));
+        const component = render(<Provider store={store}><AphorismList /></Provider>);
+
+        const filteredAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
+        expect(filteredAphorisms).toEqual(['ap', 'aph']);
     });
 });
