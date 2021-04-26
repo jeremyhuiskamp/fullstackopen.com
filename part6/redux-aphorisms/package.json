@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "axios": "^0.21.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-redux": "^7.2.3",
@@ -42,6 +43,7 @@
     "deep-freeze": "^0.0.1",
     "eslint": "^7.22.0",
     "eslint-plugin-react": "^7.22.0",
+    "nock": "^13.0.11",
     "redux-devtools-extension": "^2.13.9"
   }
 }
