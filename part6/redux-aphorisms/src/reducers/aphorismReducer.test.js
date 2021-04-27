@@ -1,29 +1,33 @@
 const deepFreeze = require('deep-freeze');
-const { reducer, createAphorism, voteForAphorism } = require('./aphorismReducer');
+const { reducer, initAphorisms, createAphorism, voteForAphorism } = require('./aphorismReducer');
 
 describe('aphorism reducer', () => {
 
-    describe('aphorism reducer initial state', () => {
+    test('initial state should be empty', () => {
         const action = {
             type: 'DO_NOTHING',
         };
 
         const newState = reducer(undefined, action);
 
-        test('initial state should not be empty', () => {
-            expect(newState).not.toHaveLength(0);
-        });
+        expect(newState).toHaveLength(0);
+    });
 
-        test('initial aphorisms should have unique ids', () => {
-            const uniqueIds = new Set(newState.map(aphorism => aphorism.id));
-            expect(uniqueIds.size).toEqual(newState.length);
-        });
+    test('initialise aphorisms', () => {
+        const aphorisms = [{
+            id: 1,
+            content: 'aphorism1',
+            votes: 0,
+        }, {
+            id: 2,
+            content: 'aphorism2',
+            votes: 4,
+        }];
+        deepFreeze(aphorisms);
 
-        test('initial aphorisms should have 0 votes', () => {
-            newState.forEach(aphorism => {
-                expect(aphorism).toMatchObject({ votes: 0 });
-            });
-        });
+        const newState = reducer(undefined, initAphorisms(aphorisms));
+
+        expect(newState).toEqual(aphorisms);
     });
 
     test('creation of new aphorism', () => {
