@@ -21,4 +21,15 @@ describe('App component', () => {
 
         await waitFor(() => expect(store.getState().aphorisms).toHaveLength(1));
     });
+
+    test('display error if startup load fails', async () => {
+        aphorismService.getAll.mockImplementation(() =>
+            Promise.reject(new Error('pretending you forgot to start json-server')));
+
+        const store = createStore(reducer);
+        render(<Provider store={store}><App /></Provider>);
+
+        await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
+        // TODO: test notification clearance
+    });
 });

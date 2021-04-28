@@ -6,13 +6,21 @@ import Notification from './components/Notification';
 import Filter from './components/Filter';
 import aphorismService from './services/aphorisms';
 import { initAphorisms } from './reducers/aphorismReducer';
+import { setErrorNotification } from './reducers/notificationReducer';
 
 const App = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        aphorismService.getAll().then(aphorisms =>
-            dispatch(initAphorisms(aphorisms)));
+        aphorismService.getAll()
+            .then(aphorisms =>
+                dispatch(initAphorisms(aphorisms)))
+            .catch(e => {
+                console.error(`failed to fetch initial aphorisms: ${e}`);
+                const { action, clearAction } = setErrorNotification('fetching aphorisms failed');
+                dispatch(action);
+                setTimeout(() => dispatch(clearAction), 5000);
+            });
     }, [dispatch]);
 
     return <>

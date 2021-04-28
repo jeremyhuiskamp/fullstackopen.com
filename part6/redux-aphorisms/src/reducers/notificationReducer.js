@@ -23,6 +23,9 @@ const setErrorNotification = msg => setNotification(msg, 'error');
 // message, and one to clear the notification.  The two are linked, so that
 // firing the clearing action has no effect if the message has been subsequently
 // overwritten.
+//
+// TODO: add a function that dispatches the actions, with a timer for the
+// clearAction.  Otherwise we repeat this pattern throughout the app.
 const setNotification = (msg, level) => {
     const clearToken = uuid.v4();
     const clearAction = clearNotification(clearToken);
