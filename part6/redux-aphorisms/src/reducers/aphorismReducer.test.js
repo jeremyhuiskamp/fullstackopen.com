@@ -30,7 +30,7 @@ describe('aphorism reducer', () => {
         expect(newState).toEqual(aphorisms);
     });
 
-    test('creation of new aphorism', () => {
+    test('creation of new aphorism as string', () => {
         const newState = reducer([], createAphorism('english vocabulary is annoying'));
         expect(newState).toHaveLength(1);
         expect(newState).toEqual(
@@ -38,6 +38,21 @@ describe('aphorism reducer', () => {
                 expect.objectContaining({
                     content: 'english vocabulary is annoying',
                     votes: 0,
+                })]));
+    });
+
+    test('creation of new aphorism as object', () => {
+        const newState = reducer([], createAphorism({
+            content: 'wisdom',
+            votes: 3,
+            id: 'abcd',
+        }));
+        expect(newState).toHaveLength(1);
+        expect(newState).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    content: 'wisdom',
+                    votes: 3,
                 })]));
     });
 

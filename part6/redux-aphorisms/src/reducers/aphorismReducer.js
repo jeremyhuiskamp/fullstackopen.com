@@ -33,9 +33,14 @@ const initAphorisms = (aphorisms) => {
 };
 
 const createAphorism = (aphorism) => {
+    // support either just plain content, in which case we generate an id
+    // and default the vote count, or a complete aphorism defined elsewhere:
+    if (typeof aphorism === 'string') {
+        aphorism = asObject(aphorism);
+    }
     return {
         type: 'NEW_APHORISM',
-        data: asObject(aphorism),
+        data: aphorism,
     };
 };
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { useDispatch } from 'react-redux';
 import { createAphorism } from '../reducers/aphorismReducer';
+import aphorismService from '../services/aphorisms';
 
 const AphorismForm = () => {
     const dispatch = useDispatch();
@@ -10,7 +11,12 @@ const AphorismForm = () => {
         e.preventDefault();
         const content = e.target.elements.newAphorism.value;
         e.target.elements.newAphorism.value = '';
-        dispatch(createAphorism(content));
+        aphorismService.create({
+            content,
+            votes: 0,
+        }).then(data => {
+            dispatch(createAphorism(data));
+        });
     };
 
     return <form onSubmit={submit}>

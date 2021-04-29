@@ -1,5 +1,6 @@
 import nock from 'nock';
 import aphorismService from './aphorisms';
+const uuid = require('uuid');
 
 // https://github.com/nock/nock#axios
 import axios from 'axios';
@@ -23,5 +24,20 @@ describe('aphorism service', () => {
 
         const allAphorisms = await aphorismService.getAll();
         expect(allAphorisms).toEqual(servedAphorisms);
+    });
+
+    test('create aphorism', async () => {
+        nock('http://localhost:3001')
+            .post('/aphorisms')
+            .reply(201, (_uri, reqBody) => ({ ...reqBody, id: uuid.v4(), }));
+
+        const newAphorism = {
+            content: 'wisdom',
+            votes: 0,
+        };
+
+        const createdAphorism = await aphorismService.create(newAphorism);
+        expect(createdAphorism).toMatchObject(newAphorism);
+        expect(createdAphorism.id).toBeDefined();
     });
 });
