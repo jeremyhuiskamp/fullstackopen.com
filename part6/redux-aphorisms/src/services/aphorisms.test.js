@@ -40,4 +40,26 @@ describe('aphorism service', () => {
         expect(createdAphorism).toMatchObject(newAphorism);
         expect(createdAphorism.id).toBeDefined();
     });
+
+    test('vote', async () => {
+        nock('http://localhost:3001')
+            .patch('/aphorisms/12345')
+            .reply(200, (_uri, reqBody) => ({
+                votes: reqBody.votes,
+                content: 'wisdom!',
+                id: '12345',
+            }));
+
+        const updatedAphorism = await aphorismService.vote({
+            id: '12345',
+            content: 'wisdom!',
+            votes: 2,
+        });
+
+        expect(updatedAphorism).toMatchObject({
+            content: 'wisdom!',
+            votes: 3,
+            id: '12345',
+        });
+    });
 });

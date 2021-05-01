@@ -8,7 +8,14 @@ const getAll = async () =>
 const create = async aphorism =>
     (await axios.post(baseUrl, aphorism)).data;
 
+const vote = async aphorism =>
+    (await axios.patch(`${baseUrl}/${aphorism.id}`, {
+        // Hmm, is this the place for the vote calculation logic?
+        votes: aphorism.votes + 1,
+    })).data;
+
 export default {
     getAll,
     create,
+    vote,
 };
