@@ -3,12 +3,14 @@ const {
     reducer,
     initAphorisms,
     createAphorism,
+    createAphorismThunk,
     voteForAphorism,
 } = require('./aphorismReducer');
 import { reducer as fullReducer } from '../store';
 import thunk from 'redux-thunk';
 import { waitFor } from '@testing-library/dom';
 import { createStore, applyMiddleware } from 'redux';
+const uuid = require('uuid');
 
 import aphorismService from '../services/aphorisms';
 jest.mock('../services/aphorisms');
@@ -87,6 +89,37 @@ describe('aphorism reducer', () => {
                     content: 'wisdom',
                     votes: 3,
                 })]));
+    });
+
+    describe('creation of new aphorism', () => {
+        let store;
+        beforeEach(() => {
+            store = createStore(fullReducer, applyMiddleware(thunk));
+        });
+
+        test('success', async () => {
+            aphorismService.create.mockImplementation((aphorism) =>
+                Promise.resolve({ ...aphorism, id: uuid.v4(), }));
+
+            store.dispatch(createAphorismThunk('wisdom!'));
+
+            await waitFor(() => expect(store.getState().aphorisms).toHaveLength(1));
+            expect(store.getState().aphorisms[0]).toMatchObject({
+                content: 'wisdom!',
+                votes: 0,
+                id: expect.stringMatching(/[-0-9a-f]{36}/i),
+            });
+        });
+
+        test('failure', async () => {
+            aphorismService.create.mockImplementation((_) =>
+                Promise.reject(new Error('creation failed at backend')));
+
+            store.dispatch(createAphorismThunk('wisdom!'));
+
+            await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
+            expect(store.getState().aphorisms).toHaveLength(0);
+        });
     });
 
     describe('given one existing aphorism', () => {
