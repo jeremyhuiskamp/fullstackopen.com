@@ -2,7 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import AphorismList from './AphorismList';
 import { createStore } from 'redux';
-import { createAphorism } from '../reducers/aphorismReducer';
+import { aphorismCreated } from '../reducers/aphorismReducer';
 import { updateFilter } from '../reducers/filterReducer';
 import { reducer } from '../store';
 import { render } from '@testing-library/react';
@@ -16,7 +16,7 @@ test('emtpy state means no aphorisms', () => {
 
 test('render one aphorism', () => {
     const store = createStore(reducer, { aphorisms: [] });
-    store.dispatch(createAphorism('aphorism1'));
+    store.dispatch(aphorismCreated('aphorism1'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
 
     component.getByText('aphorism1');
@@ -24,7 +24,7 @@ test('render one aphorism', () => {
 
 test('vote for one aphorism', () => {
     const store = createStore(reducer, { aphorisms: [] });
-    store.dispatch(createAphorism('aphorism1'));
+    store.dispatch(aphorismCreated('aphorism1'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
 
     component.getByText('has 0');
@@ -34,9 +34,9 @@ test('vote for one aphorism', () => {
 
 test('aphorisms are sorted by votes', () => {
     const store = createStore(reducer, { aphorisms: [] });
-    store.dispatch(createAphorism('aphorism1'));
-    store.dispatch(createAphorism('aphorism2'));
-    store.dispatch(createAphorism('aphorism3'));
+    store.dispatch(aphorismCreated('aphorism1'));
+    store.dispatch(aphorismCreated('aphorism2'));
+    store.dispatch(aphorismCreated('aphorism3'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
 
     const voteFor = (aphorism) => {
@@ -55,7 +55,7 @@ test('voting for aphorism sets info notification', () => {
         aphorisms: [],
         notification: {},
     });
-    store.dispatch(createAphorism('aphorism1'));
+    store.dispatch(aphorismCreated('aphorism1'));
     const component = render(<Provider store={store}><AphorismList /></Provider>);
     const voteFor = (aphorism) => {
         within(component.getByText(aphorism).parentElement).getByText('vote').click();
@@ -82,7 +82,7 @@ describe('clearing voting notification', () => {
             aphorisms: [],
             notification: {},
         });
-        store.dispatch(createAphorism('aphorism1'));
+        store.dispatch(aphorismCreated('aphorism1'));
         const component = render(<Provider store={store}><AphorismList /></Provider>);
         const voteFor = (aphorism) => {
             within(component.getByText(aphorism).parentElement).getByText('vote').click();
@@ -103,8 +103,8 @@ describe('clearing voting notification', () => {
             aphorisms: [],
             notification: {},
         });
-        store.dispatch(createAphorism('aphorism1'));
-        store.dispatch(createAphorism('aphorism2'));
+        store.dispatch(aphorismCreated('aphorism1'));
+        store.dispatch(aphorismCreated('aphorism2'));
         const component = render(<Provider store={store}><AphorismList /></Provider>);
         const voteFor = (aphorism) => {
             within(component.getByText(aphorism).parentElement).getByText('vote').click();
@@ -139,9 +139,9 @@ describe('clearing voting notification', () => {
 describe('filtering aphorisms', () => {
     test('empty filter', () => {
         const store = createStore(reducer, { aphorisms: [], filter: {} });
-        store.dispatch(createAphorism('aphorism1'));
-        store.dispatch(createAphorism('aphorism2'));
-        store.dispatch(createAphorism('aphorism3'));
+        store.dispatch(aphorismCreated('aphorism1'));
+        store.dispatch(aphorismCreated('aphorism2'));
+        store.dispatch(aphorismCreated('aphorism3'));
         const component = render(<Provider store={store}><AphorismList /></Provider>);
 
         const filteredAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
@@ -150,9 +150,9 @@ describe('filtering aphorisms', () => {
 
     test('non-empty filter', () => {
         const store = createStore(reducer, { aphorisms: [], filter: {} });
-        store.dispatch(createAphorism('a'));
-        store.dispatch(createAphorism('ap'));
-        store.dispatch(createAphorism('aph'));
+        store.dispatch(aphorismCreated('a'));
+        store.dispatch(aphorismCreated('ap'));
+        store.dispatch(aphorismCreated('aph'));
         store.dispatch(updateFilter('ap'));
         const component = render(<Provider store={store}><AphorismList /></Provider>);
 

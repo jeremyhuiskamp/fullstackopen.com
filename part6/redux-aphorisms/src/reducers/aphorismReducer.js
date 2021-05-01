@@ -42,7 +42,7 @@ const initAphorisms = () => dispatch => {
         });
 };
 
-const createAphorism = (aphorism) => {
+const aphorismCreated = (aphorism) => {
     // support either just plain content, in which case we generate an id
     // and default the vote count, or a complete aphorism defined elsewhere:
     if (typeof aphorism === 'string') {
@@ -54,12 +54,12 @@ const createAphorism = (aphorism) => {
     };
 };
 
-const createAphorismThunk = aphorism => async dispatch => {
+const createAphorism = aphorism => async dispatch => {
     aphorismService.create({
         content: aphorism,
         votes: 0,
     }).then(aphorism =>
-        dispatch(createAphorism(aphorism))
+        dispatch(aphorismCreated(aphorism))
     ).catch(e => {
         console.error(`failed to create aphorism: ${e}`);
         const { action, clearAction } = setErrorNotification('creating aphorism failed');
@@ -78,7 +78,7 @@ const voteForAphorism = (id) => {
 export {
     reducer,
     initAphorisms,
+    aphorismCreated,
     createAphorism,
-    createAphorismThunk,
     voteForAphorism
 };

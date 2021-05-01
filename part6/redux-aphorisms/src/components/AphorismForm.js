@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { useDispatch } from 'react-redux';
-import { createAphorismThunk } from '../reducers/aphorismReducer';
+import { createAphorism } from '../reducers/aphorismReducer';
 
 const AphorismForm = () => {
     const dispatch = useDispatch();
@@ -10,7 +10,7 @@ const AphorismForm = () => {
         e.preventDefault();
         const content = e.target.elements.newAphorism.value;
         e.target.elements.newAphorism.value = '';
-        dispatch(createAphorismThunk(content));
+        dispatch(createAphorism(content));
     };
 
     return <form onSubmit={submit}>

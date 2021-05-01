@@ -8,16 +8,16 @@ import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/extend-expect';
 
-import { createAphorismThunk } from '../reducers/aphorismReducer';
+import { createAphorism } from '../reducers/aphorismReducer';
 jest.mock('../reducers/aphorismReducer', () => ({
     // mock only specific functions from the module:
     ...jest.requireActual('../reducers/aphorismReducer'),
-    createAphorismThunk: jest.fn(),
+    createAphorism: jest.fn(),
 }));
 
 test('create aphorism', async () => {
     const mockThunk = jest.fn();
-    createAphorismThunk.mockReturnValue(mockThunk);
+    createAphorism.mockReturnValue(mockThunk);
 
     const store = createStore(reducer, applyMiddleware(thunk));
     const component = render(<Provider store={store}><AphorismForm /></Provider>);

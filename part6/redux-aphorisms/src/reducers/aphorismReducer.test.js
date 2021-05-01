@@ -2,8 +2,8 @@ const deepFreeze = require('deep-freeze');
 const {
     reducer,
     initAphorisms,
+    aphorismCreated,
     createAphorism,
-    createAphorismThunk,
     voteForAphorism,
 } = require('./aphorismReducer');
 import { reducer as fullReducer } from '../store';
@@ -65,8 +65,8 @@ describe('aphorism reducer', () => {
         });
     });
 
-    test('creation of new aphorism as string', () => {
-        const newState = reducer([], createAphorism('english vocabulary is annoying'));
+    test('aphorism created as string', () => {
+        const newState = reducer([], aphorismCreated('english vocabulary is annoying'));
         expect(newState).toHaveLength(1);
         expect(newState).toEqual(
             expect.arrayContaining([
@@ -76,8 +76,8 @@ describe('aphorism reducer', () => {
                 })]));
     });
 
-    test('creation of new aphorism as object', () => {
-        const newState = reducer([], createAphorism({
+    test('aphorism created as object', () => {
+        const newState = reducer([], aphorismCreated({
             content: 'wisdom',
             votes: 3,
             id: 'abcd',
@@ -91,7 +91,7 @@ describe('aphorism reducer', () => {
                 })]));
     });
 
-    describe('creation of new aphorism', () => {
+    describe('create new aphorism', () => {
         let store;
         beforeEach(() => {
             store = createStore(fullReducer, applyMiddleware(thunk));
@@ -101,7 +101,7 @@ describe('aphorism reducer', () => {
             aphorismService.create.mockImplementation((aphorism) =>
                 Promise.resolve({ ...aphorism, id: uuid.v4(), }));
 
-            store.dispatch(createAphorismThunk('wisdom!'));
+            store.dispatch(createAphorism('wisdom!'));
 
             await waitFor(() => expect(store.getState().aphorisms).toHaveLength(1));
             expect(store.getState().aphorisms[0]).toMatchObject({
@@ -115,7 +115,7 @@ describe('aphorism reducer', () => {
             aphorismService.create.mockImplementation((_) =>
                 Promise.reject(new Error('creation failed at backend')));
 
-            store.dispatch(createAphorismThunk('wisdom!'));
+            store.dispatch(createAphorism('wisdom!'));
 
             await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
             expect(store.getState().aphorisms).toHaveLength(0);
@@ -123,7 +123,7 @@ describe('aphorism reducer', () => {
     });
 
     describe('given one existing aphorism', () => {
-        const initialState = reducer([], createAphorism('aphorism1'));
+        const initialState = reducer([], aphorismCreated('aphorism1'));
         deepFreeze(initialState);
         const aphorism1 = initialState[0];
         deepFreeze(aphorism1);
