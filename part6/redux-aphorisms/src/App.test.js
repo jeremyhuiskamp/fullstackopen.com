@@ -1,6 +1,7 @@
 import React from 'react';
 import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import { reducer } from './store';
 import { render, waitFor } from '@testing-library/react';
 import App from './App';
@@ -16,7 +17,7 @@ describe('App component', () => {
             votes: 3,
         }]);
 
-        const store = createStore(reducer);
+        const store = createStore(reducer, applyMiddleware(thunk));
         render(<Provider store={store}><App /></Provider>);
 
         await waitFor(() => expect(store.getState().aphorisms).toHaveLength(1));
@@ -26,7 +27,7 @@ describe('App component', () => {
         aphorismService.getAll.mockImplementation(() =>
             Promise.reject(new Error('pretending you forgot to start json-server')));
 
-        const store = createStore(reducer);
+        const store = createStore(reducer, applyMiddleware(thunk));
         render(<Provider store={store}><App /></Provider>);
 
         await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
