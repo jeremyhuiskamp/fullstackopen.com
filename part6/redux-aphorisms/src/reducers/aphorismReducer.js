@@ -27,17 +27,13 @@ const reducer = (state = [], action) => {
     return state;
 };
 
-const initAphorisms = (aphorisms) => {
-    return {
-        type: 'INIT_APHORISMS',
-        data: aphorisms,
-    };
-};
-
-const initAphorismsThunk = () => dispatch => {
+const initAphorisms = () => dispatch => {
     aphorismService.getAll()
         .then(aphorisms =>
-            dispatch(initAphorisms(aphorisms)))
+            dispatch({
+                type: 'INIT_APHORISMS',
+                data: aphorisms,
+            }))
         .catch(e => {
             console.error(`failed to fetch initial aphorisms: ${e}`);
             const { action, clearAction } = setErrorNotification('fetching aphorisms failed');
@@ -68,7 +64,6 @@ const voteForAphorism = (id) => {
 export {
     reducer,
     initAphorisms,
-    initAphorismsThunk,
     createAphorism,
     voteForAphorism
 };

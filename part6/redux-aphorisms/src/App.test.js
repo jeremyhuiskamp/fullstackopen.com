@@ -6,17 +6,17 @@ import { reducer } from './store';
 import { render } from '@testing-library/react';
 import App from './App';
 
-import { initAphorismsThunk } from './reducers/aphorismReducer';
+import { initAphorisms } from './reducers/aphorismReducer';
 jest.mock('./reducers/aphorismReducer', () => ({
     // mock only specific functions from the module:
     ...jest.requireActual('./reducers/aphorismReducer'),
-    initAphorismsThunk: jest.fn(),
+    initAphorisms: jest.fn(),
 }));
 
 describe('App component', () => {
     test('try to load aphorisms on startup', () => {
         const mockThunk = jest.fn();
-        initAphorismsThunk.mockReturnValue(mockThunk);
+        initAphorisms.mockReturnValue(mockThunk);
 
         const store = createStore(reducer, applyMiddleware(thunk));
         render(<Provider store={store}><App /></Provider>);

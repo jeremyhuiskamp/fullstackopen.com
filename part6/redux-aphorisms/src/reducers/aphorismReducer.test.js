@@ -2,7 +2,6 @@ const deepFreeze = require('deep-freeze');
 const {
     reducer,
     initAphorisms,
-    initAphorismsThunk,
     createAphorism,
     voteForAphorism,
 } = require('./aphorismReducer');
@@ -26,24 +25,7 @@ describe('aphorism reducer', () => {
         expect(newState).toHaveLength(0);
     });
 
-    test('initialise aphorisms', () => {
-        const aphorisms = [{
-            id: 1,
-            content: 'aphorism1',
-            votes: 0,
-        }, {
-            id: 2,
-            content: 'aphorism2',
-            votes: 4,
-        }];
-        deepFreeze(aphorisms);
-
-        const newState = reducer(undefined, initAphorisms(aphorisms));
-
-        expect(newState).toEqual(aphorisms);
-    });
-
-    describe('initialization with thunk', () => {
+    describe('initialization', () => {
         let store;
         beforeEach(() => {
             store = createStore(fullReducer, applyMiddleware(thunk));
@@ -62,7 +44,7 @@ describe('aphorism reducer', () => {
             deepFreeze(aphorisms);
             aphorismService.getAll.mockResolvedValue(aphorisms);
 
-            store.dispatch(initAphorismsThunk());
+            store.dispatch(initAphorisms());
 
             await waitFor(() => {
                 expect(store.getState().aphorisms).toEqual(aphorisms);
@@ -73,7 +55,7 @@ describe('aphorism reducer', () => {
             aphorismService.getAll.mockImplementation(() =>
                 Promise.reject(new Error('what will you do if the backend is down?')));
 
-            store.dispatch(initAphorismsThunk());
+            store.dispatch(initAphorisms());
 
             await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
             // TODO: test clearing of the notification?

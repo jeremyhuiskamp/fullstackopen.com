@@ -4,13 +4,13 @@ import AphorismList from './components/AphorismList';
 import AphorismForm from './components/AphorismForm';
 import Notification from './components/Notification';
 import Filter from './components/Filter';
-import { initAphorismsThunk } from './reducers/aphorismReducer';
+import { initAphorisms } from './reducers/aphorismReducer';
 
 const App = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(initAphorismsThunk());
+        dispatch(initAphorisms());
     }, [dispatch]);
 
     return <>
