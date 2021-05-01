@@ -1,4 +1,6 @@
 const uuid = require('uuid');
+import aphorismService from '../services/aphorisms';
+import { setErrorNotification } from './notificationReducer';
 
 const asObject = (aphorism) => ({
     content: aphorism,
@@ -32,6 +34,18 @@ const initAphorisms = (aphorisms) => {
     };
 };
 
+const initAphorismsThunk = () => dispatch => {
+    aphorismService.getAll()
+        .then(aphorisms =>
+            dispatch(initAphorisms(aphorisms)))
+        .catch(e => {
+            console.error(`failed to fetch initial aphorisms: ${e}`);
+            const { action, clearAction } = setErrorNotification('fetching aphorisms failed');
+            dispatch(action);
+            setTimeout(() => dispatch(clearAction), 5000);
+        });
+};
+
 const createAphorism = (aphorism) => {
     // support either just plain content, in which case we generate an id
     // and default the vote count, or a complete aphorism defined elsewhere:
@@ -51,9 +65,10 @@ const voteForAphorism = (id) => {
     };
 };
 
-module.exports = {
+export {
     reducer,
     initAphorisms,
+    initAphorismsThunk,
     createAphorism,
     voteForAphorism
 };

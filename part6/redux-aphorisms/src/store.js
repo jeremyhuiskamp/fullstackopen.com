@@ -1,4 +1,5 @@
-import { combineReducers, createStore } from 'redux';
+import { combineReducers, createStore, applyMiddleware } from 'redux';
+import thunk from 'redux-thunk';
 import { reducer as aphorismReducer } from './reducers/aphorismReducer';
 import { reducer as notificationReducer } from './reducers/notificationReducer';
 import { reducer as filterReducer } from './reducers/filterReducer';
@@ -12,7 +13,9 @@ const reducer = combineReducers({
 
 const store = createStore(
     reducer,
-    composeWithDevTools(),
+    composeWithDevTools(
+        applyMiddleware(thunk),
+    ),
 );
 
 export {

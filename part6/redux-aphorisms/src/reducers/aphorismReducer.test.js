@@ -1,5 +1,18 @@
 const deepFreeze = require('deep-freeze');
-const { reducer, initAphorisms, createAphorism, voteForAphorism } = require('./aphorismReducer');
+const {
+    reducer,
+    initAphorisms,
+    initAphorismsThunk,
+    createAphorism,
+    voteForAphorism,
+} = require('./aphorismReducer');
+import { reducer as fullReducer } from '../store';
+import thunk from 'redux-thunk';
+import { waitFor } from '@testing-library/dom';
+import { createStore, applyMiddleware } from 'redux';
+
+import aphorismService from '../services/aphorisms';
+jest.mock('../services/aphorisms');
 
 describe('aphorism reducer', () => {
 
@@ -28,6 +41,44 @@ describe('aphorism reducer', () => {
         const newState = reducer(undefined, initAphorisms(aphorisms));
 
         expect(newState).toEqual(aphorisms);
+    });
+
+    describe('initialization with thunk', () => {
+        let store;
+        beforeEach(() => {
+            store = createStore(fullReducer, applyMiddleware(thunk));
+        });
+
+        test('success', async () => {
+            const aphorisms = [{
+                id: 1,
+                content: 'aphorism1',
+                votes: 0,
+            }, {
+                id: 2,
+                content: 'aphorism2',
+                votes: 4,
+            }];
+            deepFreeze(aphorisms);
+            aphorismService.getAll.mockResolvedValue(aphorisms);
+
+            store.dispatch(initAphorismsThunk());
+
+            await waitFor(() => {
+                expect(store.getState().aphorisms).toEqual(aphorisms);
+            });
+        });
+
+        test('failure', async () => {
+            aphorismService.getAll.mockImplementation(() =>
+                Promise.reject(new Error('what will you do if the backend is down?')));
+
+            store.dispatch(initAphorismsThunk());
+
+            await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
+            // TODO: test clearing of the notification?
+            expect(store.getState().aphorisms).toHaveLength(0);
+        });
     });
 
     test('creation of new aphorism as string', () => {
