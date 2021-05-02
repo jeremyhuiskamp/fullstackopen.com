@@ -15,17 +15,10 @@ const reducer = (state, action) => {
     return state ?? {};
 };
 
-const setInfoNotification = msg => setNotification(msg, 'info');
-
-const setErrorNotification = msg => setNotification(msg, 'error');
-
 // setNotification creates two actions: one to set the current notification
 // message, and one to clear the notification.  The two are linked, so that
 // firing the clearing action has no effect if the message has been subsequently
 // overwritten.
-//
-// TODO: add a function that dispatches the actions, with a timer for the
-// clearAction.  Otherwise we repeat this pattern throughout the app.
 const setNotification = (msg, level) => {
     const clearToken = uuid.v4();
     const clearAction = clearNotification(clearToken);
@@ -48,23 +41,21 @@ const clearNotification = clearToken => ({
     },
 });
 
-const setExpiringNotifiction = (msg, level, seconds) => dispatch => {
+const setExpiringNotification = (msg, level, seconds) => dispatch => {
     const { action, clearAction } = setNotification(msg, level);
     dispatch(action);
     setTimeout(() => dispatch(clearAction), seconds * 1000);
 };
 
-const setExpiringInfoNotification = (msg, seconds = 5) =>
-    setExpiringNotifiction(msg, 'info', seconds);
+const setInfoNotification = (msg, expirationSeconds = 5) =>
+    setExpiringNotification(msg, 'info', expirationSeconds);
 
-const setExpiringErrorNotification = (msg, seconds = 5) =>
-    setExpiringNotifiction(msg, 'error', seconds);
+const setErrorNotification = (msg, expirationSeconds = 5) =>
+    setExpiringNotification(msg, 'error', expirationSeconds);
 
 module.exports = {
     reducer,
     setInfoNotification,
-    setExpiringInfoNotification,
     setErrorNotification,
-    setExpiringErrorNotification,
     clearNotification,
 };

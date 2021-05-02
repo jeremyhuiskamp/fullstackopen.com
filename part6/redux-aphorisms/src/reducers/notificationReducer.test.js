@@ -1,8 +1,6 @@
-const deepFreeze = require('deep-freeze');
 const {
     reducer,
     setInfoNotification,
-    setExpiringInfoNotification,
     setErrorNotification,
     clearNotification,
 } = require('./notificationReducer');
@@ -13,12 +11,11 @@ import thunk from 'redux-thunk';
 describe('notification reducer', () => {
     // Create a new state and reduce all the given actions to it.
     const playActions = (...actions) => {
-        let state = undefined;
+        const store = createStore(reducer, applyMiddleware(thunk));
         actions.forEach(action => {
-            state = reducer(state, action);
-            deepFreeze(state);
+            store.dispatch(action);
         });
-        return state;
+        return store.getState();
     };
 
     test('initial state', () => {
@@ -32,64 +29,39 @@ describe('notification reducer', () => {
     });
 
     test('info', () => {
-        const newState = playActions(setInfoNotification('info!').action);
+        const newState = playActions(setInfoNotification('info!'));
         expect(newState.info).toEqual('info!');
         expect(newState.error).not.toBeDefined();
     });
 
     test('error', () => {
-        const newState = playActions(setErrorNotification('error!').action);
+        const newState = playActions(setErrorNotification('error!'));
         expect(newState.error).toEqual('error!');
         expect(newState.info).not.toBeDefined();
     });
 
     test('info overwrites error', () => {
         const newState = playActions(
-            setErrorNotification('error!').action,
-            setInfoNotification('info!').action);
+            setErrorNotification('error!'),
+            setInfoNotification('info!'));
         expect(newState.info).toEqual('info!');
         expect(newState.error).not.toBeDefined();
     });
 
     test('error overwrites info', () => {
         const newState = playActions(
-            setInfoNotification('info!').action,
-            setErrorNotification('error!').action);
+            setInfoNotification('info!'),
+            setErrorNotification('error!'));
         expect(newState.error).toEqual('error!');
         expect(newState.info).not.toBeDefined();
     });
 
     test('unconditional clear', () => {
         const newState = playActions(
-            setInfoNotification('info!').action,
+            setInfoNotification('info!'),
             clearNotification());
         expect(newState.info).not.toBeDefined();
         expect(newState.error).not.toBeDefined();
-    });
-
-    test('normal clear', () => {
-        const { action, clearAction } = setInfoNotification('info!');
-        const newState = playActions(
-            action,
-            clearAction);
-        expect(newState.info).not.toBeDefined();
-        expect(newState.error).not.toBeDefined();
-    });
-
-    test('don\'t clear overwritten notification', () => {
-        const {
-            action: infoAction,
-            clearAction: clearInfoAction,
-        } = setInfoNotification('info!');
-
-        const newState = playActions(
-            infoAction,
-            setErrorNotification('error!').action,
-            clearInfoAction,
-        );
-
-        expect(newState.error).toEqual('error!');
-        expect(newState.info).not.toBeDefined();
     });
 
     describe('expiring notifications', () => {
@@ -105,7 +77,7 @@ describe('notification reducer', () => {
         test('notification is cleared after chosen time', () => {
             const store = createStore(reducer, applyMiddleware(thunk));
 
-            store.dispatch(setExpiringInfoNotification('info!', 2));
+            store.dispatch(setInfoNotification('info!', 2));
 
             jest.advanceTimersByTime(1000);
             expect(store.getState().info).toEqual('info!');
@@ -119,12 +91,12 @@ describe('notification reducer', () => {
         test('don\'t clear overwritten notification', () => {
             const store = createStore(reducer, applyMiddleware(thunk));
 
-            store.dispatch(setExpiringInfoNotification('info1', 5));
+            store.dispatch(setInfoNotification('info1', 5));
 
             jest.advanceTimersByTime(3000); // 3s total
             expect(store.getState().info).toEqual('info1');
 
-            store.dispatch(setExpiringInfoNotification('info2', 5));
+            store.dispatch(setInfoNotification('info2', 5));
 
             jest.advanceTimersByTime(1000); // 4s total
             expect(store.getState().info).toEqual('info2');

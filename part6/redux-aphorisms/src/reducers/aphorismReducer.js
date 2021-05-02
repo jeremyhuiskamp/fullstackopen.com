@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 import aphorismService from '../services/aphorisms';
-import { setExpiringErrorNotification } from './notificationReducer';
+import { setErrorNotification } from './notificationReducer';
 
 const asObject = (aphorism) => ({
     content: aphorism,
@@ -33,7 +33,7 @@ const initAphorisms = () => dispatch => {
             }))
         .catch(e => {
             console.error(`failed to fetch initial aphorisms: ${e}`);
-            dispatch(setExpiringErrorNotification('fetching aphorisms failed'));
+            dispatch(setErrorNotification('fetching aphorisms failed'));
         });
 };
 
@@ -57,7 +57,7 @@ const createAphorism = aphorism => async dispatch => {
         dispatch(aphorismCreated(aphorism))
     ).catch(e => {
         console.error(`failed to create aphorism: ${e}`);
-        dispatch(setExpiringErrorNotification('creating aphorism failed'));
+        dispatch(setErrorNotification('creating aphorism failed'));
     });
 };
 
@@ -71,7 +71,7 @@ const voteForAphorism = aphorism => async dispatch => {
         })
     ).catch(e => {
         console.error(`failed to vote for aphorism: ${e}`);
-        dispatch(setExpiringErrorNotification('voting for aphorism failed'));
+        dispatch(setErrorNotification('voting for aphorism failed'));
     });
 };
 

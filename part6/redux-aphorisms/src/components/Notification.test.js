@@ -6,7 +6,7 @@ import { reducer } from '../store';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import Notification from './Notification';
-import { setExpiringErrorNotification, setExpiringInfoNotification } from '../reducers/notificationReducer';
+import { setErrorNotification, setInfoNotification } from '../reducers/notificationReducer';
 
 describe('Notification component', () => {
     test('no notification means empty render', () => {
@@ -17,7 +17,7 @@ describe('Notification component', () => {
 
     test('render error notification', () => {
         const store = createStore(reducer, applyMiddleware(thunk));
-        store.dispatch(setExpiringErrorNotification('error!'));
+        store.dispatch(setErrorNotification('error!'));
         const component = render(<Provider store={store}><Notification /></Provider>);
         const notification = component.getByTestId('notification');
         expect(notification.textContent).toContain('error!');
@@ -27,7 +27,7 @@ describe('Notification component', () => {
 
     test('render info notification', () => {
         const store = createStore(reducer, applyMiddleware(thunk));
-        store.dispatch(setExpiringInfoNotification('info!'));
+        store.dispatch(setInfoNotification('info!'));
         const component = render(<Provider store={store}><Notification /></Provider>);
         const notification = component.getByTestId('notification');
         expect(notification.textContent).toContain('info!');
