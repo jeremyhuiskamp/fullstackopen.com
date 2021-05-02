@@ -48,9 +48,23 @@ const clearNotification = clearToken => ({
     },
 });
 
+const setExpiringNotifiction = (msg, level, seconds) => dispatch => {
+    const { action, clearAction } = setNotification(msg, level);
+    dispatch(action);
+    setTimeout(() => dispatch(clearAction), seconds * 1000);
+};
+
+const setExpiringInfoNotification = (msg, seconds) =>
+    setExpiringNotifiction(msg, 'info', seconds);
+
+const setExpiringErrorNotification = (msg, seconds) =>
+    setExpiringNotifiction(msg, 'error', seconds);
+
 module.exports = {
     reducer,
     setInfoNotification,
+    setExpiringInfoNotification,
     setErrorNotification,
+    setExpiringErrorNotification,
     clearNotification,
 };
