@@ -23,7 +23,10 @@ const reducer = (state = [], action) => {
                 votes: aphorism.votes + 1,
             }));
         }
+        case 'UPDATE_APHORISM':
+            return update(state, action.data.id, () => action.data);
     }
+
     return state;
 };
 
@@ -75,10 +78,27 @@ const voteForAphorism = (id) => {
     };
 };
 
+const voteForAphorismThunk = aphorism => async dispatch => {
+    aphorismService.vote(
+        aphorism
+    ).then(aphorism =>
+        dispatch({
+            type: 'UPDATE_APHORISM',
+            data: aphorism,
+        })
+    ).catch(e => {
+        console.error(`failed to vote for aphorism: ${e}`);
+        const { action, clearAction } = setErrorNotification('voting for aphorism failed');
+        dispatch(action);
+        setTimeout(() => dispatch(clearAction), 5000);
+    });
+};
+
 export {
     reducer,
     initAphorisms,
     aphorismCreated,
     createAphorism,
-    voteForAphorism
+    voteForAphorism,
+    voteForAphorismThunk,
 };
