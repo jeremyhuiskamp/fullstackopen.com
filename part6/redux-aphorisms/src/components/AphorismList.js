@@ -2,7 +2,7 @@ import React from 'react';
 import Aphorism from './Aphorism';
 import { useSelector, useDispatch } from 'react-redux';
 import { voteForAphorism } from '../reducers/aphorismReducer';
-import { setInfoNotification } from '../reducers/notificationReducer';
+import { setExpiringInfoNotification } from '../reducers/notificationReducer';
 
 const AphorismList = () => {
     const { aphorisms, filter = '' } = useSelector(
@@ -16,9 +16,8 @@ const AphorismList = () => {
 
     const vote = (aphorism) => {
         dispatch(voteForAphorism(aphorism));
-        const { action, clearAction } = setInfoNotification(`you voted for "${aphorism.content}"`);
-        dispatch(action);
-        setTimeout(() => dispatch(clearAction), 5000);
+        // TODO: push notification down into the voting action:
+        dispatch(setExpiringInfoNotification(`you voted for "${aphorism.content}"`, 5));
     };
 
     return <div>

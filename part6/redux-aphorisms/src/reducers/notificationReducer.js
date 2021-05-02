@@ -54,10 +54,10 @@ const setExpiringNotifiction = (msg, level, seconds) => dispatch => {
     setTimeout(() => dispatch(clearAction), seconds * 1000);
 };
 
-const setExpiringInfoNotification = (msg, seconds) =>
+const setExpiringInfoNotification = (msg, seconds = 5) =>
     setExpiringNotifiction(msg, 'info', seconds);
 
-const setExpiringErrorNotification = (msg, seconds) =>
+const setExpiringErrorNotification = (msg, seconds = 5) =>
     setExpiringNotifiction(msg, 'error', seconds);
 
 module.exports = {
