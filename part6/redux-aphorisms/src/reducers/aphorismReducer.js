@@ -8,8 +8,8 @@ const asObject = (aphorism) => ({
     votes: 0,
 });
 
-const update = (arr, id, f) =>
-    arr.map(it => it.id === id ? { ...it, ...f(it) } : it);
+const replace = (arr, item) =>
+    arr.map(it => it.id === item.id ? item : it);
 
 const reducer = (state = [], action) => {
     switch (action.type) {
@@ -17,14 +17,8 @@ const reducer = (state = [], action) => {
             return action.data;
         case 'NEW_APHORISM':
             return [...state, action.data];
-        case 'VOTE_FOR_APHORISM': {
-            const id = action.data;
-            return update(state, id, aphorism => ({
-                votes: aphorism.votes + 1,
-            }));
-        }
         case 'UPDATE_APHORISM':
-            return update(state, action.data.id, () => action.data);
+            return replace(state, action.data);
     }
 
     return state;
@@ -71,14 +65,7 @@ const createAphorism = aphorism => async dispatch => {
     });
 };
 
-const voteForAphorism = (id) => {
-    return {
-        type: 'VOTE_FOR_APHORISM',
-        data: id,
-    };
-};
-
-const voteForAphorismThunk = aphorism => async dispatch => {
+const voteForAphorism = aphorism => async dispatch => {
     aphorismService.vote(
         aphorism
     ).then(aphorism =>
@@ -100,5 +87,4 @@ export {
     aphorismCreated,
     createAphorism,
     voteForAphorism,
-    voteForAphorismThunk,
 };

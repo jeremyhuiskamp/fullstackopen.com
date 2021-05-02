@@ -5,7 +5,6 @@ const {
     aphorismCreated,
     createAphorism,
     voteForAphorism,
-    voteForAphorismThunk,
 } = require('./aphorismReducer');
 import { reducer as fullReducer } from '../store';
 import thunk from 'redux-thunk';
@@ -123,21 +122,6 @@ describe('aphorism reducer', () => {
         });
     });
 
-    describe('given one existing aphorism', () => {
-        const initialState = reducer([], aphorismCreated('aphorism1'));
-        deepFreeze(initialState);
-        const aphorism1 = initialState[0];
-        deepFreeze(aphorism1);
-
-        test('can vote for aphorism', () => {
-            const newState = reducer(initialState, voteForAphorism(aphorism1.id));
-            expect(newState).toEqual([{ ...aphorism1, votes: 1 }]);
-
-            const newState2 = reducer(newState, voteForAphorism(aphorism1.id));
-            expect(newState2).toEqual([{ ...aphorism1, votes: 2 }]);
-        });
-    });
-
     describe('voting for an aphorism', () => {
         let store;
         let getAphorism;
@@ -151,7 +135,7 @@ describe('aphorism reducer', () => {
             aphorismService.vote.mockImplementation((aphorism) =>
                 Promise.resolve({ ...aphorism, votes: aphorism.votes + 1, }));
 
-            store.dispatch(voteForAphorismThunk(getAphorism()));
+            store.dispatch(voteForAphorism(getAphorism()));
 
             await waitFor(() => {
                 expect(getAphorism().votes).toEqual(1);
@@ -162,7 +146,7 @@ describe('aphorism reducer', () => {
             aphorismService.vote.mockImplementation(() =>
                 Promise.reject(new Error('the backend is down')));
 
-            store.dispatch(voteForAphorismThunk(getAphorism()));
+            store.dispatch(voteForAphorism(getAphorism()));
 
             await waitFor(() => expect(store.getState().notification?.error).toMatch('failed'));
             expect(getAphorism().votes).toEqual(0);
