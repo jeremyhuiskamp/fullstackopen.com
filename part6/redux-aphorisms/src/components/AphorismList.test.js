@@ -61,19 +61,6 @@ describe('display aphorism list', () => {
         });
     });
 
-    test('voting for aphorism sets info notification', () => {
-        store.dispatch(aphorismCreated('aphorism1'));
-        const component = render(<Provider store={store}><AphorismList /></Provider>);
-        const voteFor = (aphorism) => {
-            within(component.getByText(aphorism).parentElement).getByText('vote').click();
-        };
-        voteFor('aphorism1');
-
-        expect(store.getState().notification).toMatchObject({
-            info: 'you voted for "aphorism1"',
-        });
-    });
-
     describe('filtering aphorisms', () => {
         test('empty filter', () => {
             store.dispatch(aphorismCreated('aphorism1'));

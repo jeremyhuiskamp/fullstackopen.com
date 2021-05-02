@@ -1,6 +1,6 @@
 const uuid = require('uuid');
 import aphorismService from '../services/aphorisms';
-import { setErrorNotification } from './notificationReducer';
+import { setInfoNotification, setErrorNotification } from './notificationReducer';
 
 const asObject = (aphorism) => ({
     content: aphorism,
@@ -64,12 +64,13 @@ const createAphorism = aphorism => async dispatch => {
 const voteForAphorism = aphorism => async dispatch => {
     aphorismService.vote(
         aphorism
-    ).then(aphorism =>
+    ).then(aphorism => {
         dispatch({
             type: 'UPDATE_APHORISM',
             data: aphorism,
-        })
-    ).catch(e => {
+        });
+        dispatch(setInfoNotification(`you voted for "${aphorism.content}"`));
+    }).catch(e => {
         console.error(`failed to vote for aphorism: ${e}`);
         dispatch(setErrorNotification('voting for aphorism failed'));
     });

@@ -140,6 +140,9 @@ describe('aphorism reducer', () => {
             await waitFor(() => {
                 expect(getAphorism().votes).toEqual(1);
             });
+            expect(store.getState().notification).toMatchObject({
+                info: 'you voted for "wisdom!"',
+            });
         });
 
         test('failure', async () => {
