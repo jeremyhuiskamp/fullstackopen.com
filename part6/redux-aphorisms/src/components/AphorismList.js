@@ -1,7 +1,7 @@
 import React from 'react';
 import Aphorism from './Aphorism';
 import { useSelector, useDispatch } from 'react-redux';
-import { voteForAphorism } from '../reducers/aphorismReducer';
+import { voteForAphorismThunk } from '../reducers/aphorismReducer';
 import { setInfoNotification } from '../reducers/notificationReducer';
 
 const AphorismList = () => {
@@ -15,7 +15,7 @@ const AphorismList = () => {
     const sortedAphorisms = filteredAphorisms.slice().sort((a, b) => b.votes - a.votes);
 
     const vote = (aphorism) => {
-        dispatch(voteForAphorism(aphorism.id));
+        dispatch(voteForAphorismThunk(aphorism));
         const { action, clearAction } = setInfoNotification(`you voted for "${aphorism.content}"`);
         dispatch(action);
         setTimeout(() => dispatch(clearAction), 5000);

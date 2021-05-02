@@ -7,12 +7,18 @@ import { aphorismCreated } from '../reducers/aphorismReducer';
 import { updateFilter } from '../reducers/filterReducer';
 import { reducer } from '../store';
 import { render } from '@testing-library/react';
-import { within } from '@testing-library/dom';
+import { within, waitFor } from '@testing-library/dom';
+
+import aphorismService from '../services/aphorisms';
+jest.mock('../services/aphorisms');
 
 describe('display aphorism list', () => {
     let store;
     beforeEach(() => {
         store = createStore(reducer, applyMiddleware(thunk));
+
+        aphorismService.vote.mockImplementation(aphorism =>
+            Promise.resolve({ ...aphorism, votes: aphorism.votes + 1 }));
     });
 
     test('emtpy state means no aphorisms', () => {
@@ -27,16 +33,16 @@ describe('display aphorism list', () => {
         component.getByText('aphorism1');
     });
 
-    test('vote for one aphorism', () => {
+    test('vote for one aphorism', async () => {
         store.dispatch(aphorismCreated('aphorism1'));
         const component = render(<Provider store={store}><AphorismList /></Provider>);
 
         component.getByText('has 0');
         component.getByText('vote').click();
-        component.getByText('has 1');
+        await component.findByText('has 1');
     });
 
-    test('aphorisms are sorted by votes', () => {
+    test('aphorisms are sorted by votes', async () => {
         store.dispatch(aphorismCreated('aphorism1'));
         store.dispatch(aphorismCreated('aphorism2'));
         store.dispatch(aphorismCreated('aphorism3'));
@@ -49,8 +55,10 @@ describe('display aphorism list', () => {
         voteFor('aphorism2');
         voteFor('aphorism3');
 
-        const sortedAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
-        expect(sortedAphorisms).toEqual(['aphorism2', 'aphorism3', 'aphorism1']);
+        await waitFor(() => {
+            const sortedAphorisms = component.getAllByTestId('aphorism-content').map(p => p.innerHTML);
+            expect(sortedAphorisms).toEqual(['aphorism2', 'aphorism3', 'aphorism1']);
+        });
     });
 
     test('voting for aphorism sets info notification', () => {
