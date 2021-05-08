@@ -1,9 +1,8 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const Notification = () => {
-    const notification = useSelector(state => state.notification);
-
+const Notification = ({ notification }) => {
     const [msg, className] = notification.error !== undefined ?
         [notification.error, 'error'] :
         notification.info !== undefined ?
@@ -18,4 +17,15 @@ const Notification = () => {
     </div>;
 };
 
-export default Notification;
+Notification.propTypes = {
+    notification: PropTypes.shape({
+        error: PropTypes.string,
+        info: PropTypes.string,
+    }),
+};
+
+const mapStateToProps = state => ({
+    notification: state.notification,
+});
+
+export default connect(mapStateToProps)(Notification);
