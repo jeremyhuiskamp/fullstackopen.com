@@ -1,16 +1,15 @@
 import React from 'react';
 
-import { useDispatch } from 'react-redux';
 import { createAphorism } from '../reducers/aphorismReducer';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const AphorismForm = () => {
-    const dispatch = useDispatch();
-
+const AphorismForm = ({ createAphorism }) => {
     const submit = (e) => {
         e.preventDefault();
         const content = e.target.elements.newAphorism.value;
         e.target.elements.newAphorism.value = '';
-        dispatch(createAphorism(content));
+        createAphorism(content);
     };
 
     return <form onSubmit={submit}>
@@ -19,4 +18,11 @@ const AphorismForm = () => {
     </form>;
 };
 
-export default AphorismForm;
+AphorismForm.propTypes = {
+    createAphorism: PropTypes.func,
+};
+
+export default connect(
+    undefined,
+    { createAphorism },
+)(AphorismForm);

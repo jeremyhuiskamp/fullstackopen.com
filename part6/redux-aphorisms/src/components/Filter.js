@@ -1,13 +1,11 @@
 import React from 'react';
-
-import { useDispatch } from 'react-redux';
 import { updateFilter } from '../reducers/filterReducer';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const Filter = () => {
-    const dispatch = useDispatch();
-
+const Filter = ({ updateFilter }) => {
     const onChange = e => {
-        dispatch(updateFilter(e.target.value));
+        updateFilter(e.target.value);
     };
 
     return <div>
@@ -15,4 +13,11 @@ const Filter = () => {
     </div>;
 };
 
-export default Filter;
+Filter.propTypes = {
+    updateFilter: PropTypes.func,
+};
+
+export default connect(
+    undefined,
+    { updateFilter },
+)(Filter);

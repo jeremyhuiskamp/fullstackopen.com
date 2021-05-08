@@ -1,17 +1,16 @@
 import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import AphorismList from './components/AphorismList';
 import AphorismForm from './components/AphorismForm';
 import Notification from './components/Notification';
 import Filter from './components/Filter';
 import { initAphorisms } from './reducers/aphorismReducer';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
-const App = () => {
-    const dispatch = useDispatch();
-
+const App = ({ initAphorisms }) => {
     useEffect(() => {
-        dispatch(initAphorisms());
-    }, [dispatch]);
+        initAphorisms();
+    }, []);
 
     return <>
         <h2>Aphorisms</h2>
@@ -23,4 +22,11 @@ const App = () => {
     </>;
 };
 
-export default App;
+App.propTypes = {
+    initAphorisms: PropTypes.func,
+};
+
+export default connect(
+    undefined,
+    { initAphorisms },
+)(App);
