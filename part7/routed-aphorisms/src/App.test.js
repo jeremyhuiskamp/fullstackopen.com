@@ -1,12 +1,21 @@
 import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
-import { render } from '@testing-library/react';
+import { render, act } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
 describe('App', () => {
+    beforeEach(() => {
+        jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+        jest.runOnlyPendingTimers();
+        jest.useRealTimers();
+    });
+
     let app, history;
     beforeEach(() => {
         history = createMemoryHistory();
@@ -56,9 +65,17 @@ describe('App', () => {
             const form = app.getByTestId('create-aphorism');
             userEvent.type(within(form).getByLabelText(/content/), 'wisdom!');
             within(form).getByRole('button').click();
-            app.getByTestId('link-aphorisms').click();
 
+            // back to default view:
+            expect(history.location.pathname).toEqual('/');
+            // aphorism is shown:
             app.getByText('wisdom!');
+
+            // a notification is shown:
+            expect(app.getByRole('status').textContent).toContain('new anecdote created');
+            // the notification is cleared:
+            act(() => { jest.advanceTimersByTime(11000); });
+            expect(app.queryByRole('status')).toBeNull();
         });
     });
 

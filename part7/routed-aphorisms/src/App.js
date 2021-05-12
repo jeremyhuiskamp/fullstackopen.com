@@ -5,6 +5,7 @@ import {
     Route,
     Switch,
     useRouteMatch,
+    useHistory,
 } from 'react-router-dom';
 import './App.css';
 import PropTypes from 'prop-types';
@@ -19,6 +20,17 @@ const Menu = () => {
         <li><NavLink activeStyle={activeStyle} data-testid='link-create' to='/create'>Create New</NavLink></li>
         <li><NavLink activeStyle={activeStyle} data-testid='link-about' to='/about'>About</NavLink></li>
     </ul>;
+};
+
+const Notification = ({ content }) => {
+    if (content) {
+        return <p role='status'>{content}</p>;
+    }
+    return <></>;
+};
+
+Notification.propTypes = {
+    content: PropTypes.string,
 };
 
 const Aphorisms = ({ aphorisms }) => {
@@ -65,6 +77,8 @@ const CreateAphorism = ({ addNew }) => {
     const [author, setAuthor] = useState('');
     const [info, setInfo] = useState('');
 
+    const history = useHistory();
+
     const handleSubmit = (e) => {
         e.preventDefault();
         addNew({
@@ -76,6 +90,8 @@ const CreateAphorism = ({ addNew }) => {
         setContent('');
         setAuthor('');
         setInfo('');
+
+        history.push('/');
     };
 
     return <div data-testid='create-aphorism'>
@@ -152,9 +168,17 @@ const App = () => {
         id: '2'
     }]);
 
+    const [notification, setNotification] = useState({});
+
     const addNew = (aphorism) => {
         aphorism = { ...aphorism, id: uuid.v4() };
         setAphorisms(aphorisms.concat(aphorism));
+
+        clearTimeout(notification.timer);
+        setNotification({
+            timer: setTimeout(() => setNotification({}), 10000),
+            content: `new anecdote created: ${aphorism.content}`,
+        });
     };
 
     const matchedAphorism = useRouteMatch('/aphorisms/:id');
@@ -164,6 +188,7 @@ const App = () => {
         <>
             <h1>Software aphorisms</h1>
             <Menu />
+            <Notification content={notification.content} />
 
             <Switch>
                 <Route path='/create'>
