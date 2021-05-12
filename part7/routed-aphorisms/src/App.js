@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import {
     NavLink,
+    Link,
     Route,
     Switch,
+    useRouteMatch,
 } from 'react-router-dom';
 import './App.css';
 import PropTypes from 'prop-types';
@@ -20,7 +22,9 @@ const Aphorisms = ({ aphorisms }) => {
     return <div data-testid='aphorisms'>
         <h2>Aphorisms</h2>
         <ul>
-            {aphorisms.map(aphorism => <li key={aphorism.id}>{aphorism.content}</li>)}
+            {aphorisms.map(aphorism => <li key={aphorism.id}>
+                <Link to={`/aphorisms/${aphorism.id}`}>{aphorism.content}</Link>
+            </li>)}
         </ul>
     </div>;
 };
@@ -30,6 +34,27 @@ Aphorisms.propTypes = {
         id: PropTypes.string,
         content: PropTypes.string,
     })),
+};
+
+const Aphorism = ({ aphorism }) => {
+    if (!aphorism) {
+        return <h2>No such aphorism!</h2>;
+    }
+    return <div data-testid='aphorism'>
+        <h2>{aphorism.content} by {aphorism.author}</h2>
+        <p>has {aphorism.votes} vote(s)</p>
+        <p>for more info see <a href={aphorism.info}>{aphorism.info}</a></p>
+    </div>;
+};
+
+Aphorism.propTypes = {
+    aphorism: PropTypes.shape({
+        id: PropTypes.string,
+        content: PropTypes.string,
+        author: PropTypes.string,
+        info: PropTypes.string,
+        votes: PropTypes.number,
+    }),
 };
 
 const CreateAphorism = ({ addNew }) => {
@@ -129,6 +154,9 @@ const App = () => {
         setAphorisms(aphorisms.concat(aphorism));
     };
 
+    const matchedAphorism = useRouteMatch('/aphorisms/:id');
+    const displayedAphorism = aphorisms.find(a => a.id === matchedAphorism?.params?.id);
+
     return (
         <>
             <h1>Software aphorisms</h1>
@@ -141,6 +169,9 @@ const App = () => {
                 </Route>
                 <Route path='/about'>
                     <About />
+                </Route>
+                <Route path='/aphorisms/:id'>
+                    <Aphorism aphorism={displayedAphorism} />
                 </Route>
                 <Route path='/'>
                     <Aphorisms aphorisms={aphorisms} />

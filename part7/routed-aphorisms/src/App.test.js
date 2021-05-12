@@ -2,37 +2,33 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import { render } from '@testing-library/react';
-import { getByLabelText, getByRole, within } from '@testing-library/dom';
+import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import App from './App';
 
 describe('App', () => {
-    const newApp = () => {
-        const history = createMemoryHistory();
-        return [
-            render(
-                <Router history={history}>
-                    <App />
-                </Router>),
-            history,
-        ];
-    };
+    let app, history;
+    beforeEach(() => {
+        history = createMemoryHistory();
+        app = render(
+            <Router history={history}>
+                <App />
+            </Router>
+        );
+    });
 
     test('header links rendered by default', () => {
-        const [component] = newApp();
-        component.getByTestId('link-aphorisms');
-        component.getByTestId('link-create');
-        component.getByTestId('link-about');
+        app.getByTestId('link-aphorisms');
+        app.getByTestId('link-create');
+        app.getByTestId('link-about');
     });
 
     test('footer rendered by default', () => {
-        const [component] = newApp();
-        component.getByTestId('footer');
+        app.getByTestId('footer');
     });
 
     test('aphorisms shown by default', () => {
-        const [component] = newApp();
-        const aphorisms = component.getByTestId('aphorisms');
+        const aphorisms = app.getByTestId('aphorisms');
         within(aphorisms).getByText('Aphorisms');
         within(aphorisms).getByText(/^If it hurts,/);
         within(aphorisms).getByText(/^Premature optimization/);
@@ -40,53 +36,70 @@ describe('App', () => {
 
     describe('create new aphorism', () => {
         test('navigating to /create', () => {
-            const [component, history] = newApp();
             history.push('/create');
 
-            expect(component.queryByTestId('aphorisms')).toBeNull();
-            component.getByTestId('create-aphorism');
+            expect(app.queryByTestId('aphorisms')).toBeNull();
+            app.getByTestId('create-aphorism');
         });
 
         test('clicking header link', () => {
-            const [component, history] = newApp();
-            component.getByTestId('link-create').click();
+            app.getByTestId('link-create').click();
 
             expect(history.location.pathname).toEqual('/create');
-            expect(component.queryByTestId('aphorisms')).toBeNull();
-            component.getByTestId('create-aphorism');
+            expect(app.queryByTestId('aphorisms')).toBeNull();
+            app.getByTestId('create-aphorism');
         });
 
         test('add aphorism', () => {
-            const [component] = newApp();
-            component.getByTestId('link-create').click();
+            app.getByTestId('link-create').click();
 
-            const form = component.getByTestId('create-aphorism');
-            userEvent.type(getByLabelText(form, 'content:'), 'wisdom!');
-            getByRole(form, 'button').click();
-            component.getByTestId('link-aphorisms').click();
+            const form = app.getByTestId('create-aphorism');
+            userEvent.type(within(form).getByLabelText(/content/), 'wisdom!');
+            within(form).getByRole('button').click();
+            app.getByTestId('link-aphorisms').click();
 
-            component.getByText('wisdom!');
+            app.getByText('wisdom!');
         });
     });
 
     describe('about app', () => {
         test('clicking header link', () => {
-            const [component, history] = newApp();
-            component.getByTestId('link-about').click();
+            app.getByTestId('link-about').click();
 
             expect(history.location.pathname).toEqual('/about');
-            expect(component.queryByTestId('aphorisms')).toBeNull();
-            expect(component.queryByTestId('create-aphorism')).toBeNull();
-            component.getByTestId('about');
+            expect(app.queryByTestId('aphorisms')).toBeNull();
+            expect(app.queryByTestId('create-aphorism')).toBeNull();
+            app.getByTestId('about');
         });
 
         test('navigating to /about', () => {
-            const [component, history] = newApp();
             history.push('/about');
 
-            expect(component.queryByTestId('aphorisms')).toBeNull();
-            expect(component.queryByTestId('create-aphorism')).toBeNull();
-            component.getByTestId('about');
+            expect(app.queryByTestId('aphorisms')).toBeNull();
+            expect(app.queryByTestId('create-aphorism')).toBeNull();
+            app.getByTestId('about');
+        });
+    });
+
+    describe('view single anecdote', () => {
+        test('click and view', () => {
+            app.getByText(/^If it hurts/).click();
+            expect(app.queryByTestId('aphorisms')).toBeNull();
+
+            const aphorism = app.getByTestId('aphorism');
+            const heading = within(aphorism).getByRole('heading', { level: 2 });
+            expect(heading.textContent).toContain('If it hurts');
+            expect(heading.textContent).toContain('by Jez Humble');
+
+            const linkParagraph = within(aphorism).getByText(/for more info/);
+            const link = within(linkParagraph).getByRole('link');
+            expect(link.href).toContain('martinfowler.com');
+        });
+
+        test('visit aphorism that doesn\'t exist', () => {
+            history.push('/aphorisms/nopenopenope');
+            const heading = app.getByRole('heading', { level: 2 });
+            expect(heading.textContent).toEqual('No such aphorism!');
         });
     });
 });
