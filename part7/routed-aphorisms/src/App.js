@@ -11,10 +11,13 @@ import PropTypes from 'prop-types';
 const uuid = require('uuid');
 
 const Menu = () => {
+    const activeStyle = {
+        fontWeight: 'bold',
+    };
     return <ul className="navigation">
-        <li><NavLink data-testid='link-aphorisms' to='/'>Aphorisms</NavLink></li>
-        <li><NavLink data-testid='link-create' to='/create'>Create New</NavLink></li>
-        <li><NavLink data-testid='link-about' to='/about'>About</NavLink></li>
+        <li><NavLink activeStyle={activeStyle} exact data-testid='link-aphorisms' to='/'>Aphorisms</NavLink></li>
+        <li><NavLink activeStyle={activeStyle} data-testid='link-create' to='/create'>Create New</NavLink></li>
+        <li><NavLink activeStyle={activeStyle} data-testid='link-about' to='/about'>About</NavLink></li>
     </ul>;
 };
 
