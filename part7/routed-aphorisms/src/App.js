@@ -10,6 +10,7 @@ import {
 import './App.css';
 import PropTypes from 'prop-types';
 const uuid = require('uuid');
+import { useField } from './hooks';
 
 const Menu = () => {
     const activeStyle = {
@@ -73,23 +74,20 @@ Aphorism.propTypes = {
 };
 
 const CreateAphorism = ({ addNew }) => {
-    const [content, setContent] = useState('');
-    const [author, setAuthor] = useState('');
-    const [info, setInfo] = useState('');
+    const content = useField('text');
+    const author = useField('text');
+    const info = useField('text');
 
     const history = useHistory();
 
     const handleSubmit = (e) => {
         e.preventDefault();
         addNew({
-            content,
-            author,
-            info,
+            content: content.value,
+            author: author.value,
+            info: info.value,
             votes: 0,
         });
-        setContent('');
-        setAuthor('');
-        setInfo('');
 
         history.push('/');
     };
@@ -99,20 +97,17 @@ const CreateAphorism = ({ addNew }) => {
         <form onSubmit={handleSubmit}>
             <label>
                 content:&nbsp;
-                <input
-                    name='content'
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)} />
+                <input {...content} />
             </label>
             <br />
             <label>
                 author:&nbsp;
-                <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+                <input {...author} />
             </label>
             <br />
             <label>
                 url for more info:&nbsp;
-                <input name='info' value={info} onChange={(e) => setInfo(e.target.value)} />
+                <input {...info} />
             </label>
             <br />
             <button>create</button>
