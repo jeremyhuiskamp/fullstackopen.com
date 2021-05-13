@@ -83,13 +83,20 @@ const CreateAphorism = ({ addNew }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         addNew({
-            content: content.value,
-            author: author.value,
-            info: info.value,
+            content: content.input.value,
+            author: author.input.value,
+            info: info.input.value,
             votes: 0,
         });
 
         history.push('/');
+    };
+
+    const clear = (e) => {
+        e.preventDefault();
+        content.reset();
+        author.reset();
+        info.reset();
     };
 
     return <div data-testid='create-aphorism'>
@@ -97,20 +104,21 @@ const CreateAphorism = ({ addNew }) => {
         <form onSubmit={handleSubmit}>
             <label>
                 content:&nbsp;
-                <input {...content} />
+                <input {...content.input} />
             </label>
             <br />
             <label>
                 author:&nbsp;
-                <input {...author} />
+                <input {...author.input} />
             </label>
             <br />
             <label>
                 url for more info:&nbsp;
-                <input {...info} />
+                <input {...info.input} />
             </label>
             <br />
             <button>create</button>
+            <button onClick={clear}>clear</button>
         </form>
         <br />
     </div>;

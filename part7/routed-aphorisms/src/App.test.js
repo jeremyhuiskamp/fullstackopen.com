@@ -64,7 +64,7 @@ describe('App', () => {
 
             const form = app.getByTestId('create-aphorism');
             userEvent.type(within(form).getByLabelText(/content/), 'wisdom!');
-            within(form).getByRole('button').click();
+            within(form).getByRole('button', { name: 'create' }).click();
 
             // back to default view:
             expect(history.location.pathname).toEqual('/');
@@ -76,6 +76,23 @@ describe('App', () => {
             // the notification is cleared:
             act(() => { jest.advanceTimersByTime(11000); });
             expect(app.queryByRole('status')).toBeNull();
+        });
+
+        test('clear aphorism form', () => {
+            // given a populated aphorism form
+            history.push('/create');
+            const form = app.getByTestId('create-aphorism');
+            userEvent.type(within(form).getByLabelText(/content/), 'wisdom!');
+            userEvent.type(within(form).getByLabelText(/author/), 'me');
+            userEvent.type(within(form).getByLabelText(/info/), 'http://url');
+
+            // when we click the clear button
+            within(form).getByRole('button', { name: 'clear' }).click();
+
+            // then the form is still visible, but is now empty
+            expect(within(form).getByLabelText(/content/).value).toEqual('');
+            expect(within(form).getByLabelText(/author/).value).toEqual('');
+            expect(within(form).getByLabelText(/info/).value).toEqual('');
         });
     });
 
