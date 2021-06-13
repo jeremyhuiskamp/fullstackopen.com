@@ -6,6 +6,11 @@ import Login from './components/Login';
 import BlogCreator from './components/BlogCreator';
 import Notification from './components/Notification';
 import Toggle from './components/Toggle';
+import { useDispatch } from 'react-redux';
+import {
+    setInfoNotification,
+    setErrorNotification,
+} from './reducers/notificationReducer';
 
 const App = () => {
     const [blogs, _setBlogs] = useState([]);
@@ -13,28 +18,9 @@ const App = () => {
         _setBlogs(blogs.sort((a, b) => b.likes - a.likes));
 
     const [user, setUser] = useState(null);
-    const [notification, setNotification] = useState(null);
     const toggleRef = useRef();
 
-    // lower-level notification state setter:
-    const doNotify = (msg, isError = false) => {
-        if (notification) {
-            clearTimeout(notification.timeout);
-        }
-
-        const newTimeout = setTimeout(() => {
-            setNotification(null);
-        }, 5000);
-
-        setNotification({ msg, isError, timeout: newTimeout });
-    };
-
-    // higher-level notification api for components to use:
-    const notify = {
-        msg: (msg) => doNotify(msg),
-        error: (msg) => doNotify(msg, true),
-        clear: () => doNotify(null),
-    };
+    const dispatch = useDispatch();
 
     const reloadBlogs = () => {
         blogService.getAll().then(blogs => {
@@ -49,14 +35,14 @@ const App = () => {
             await blogService.create(title, author, url, user);
         } catch (e) {
             blogService.ifBadRequest(e, (msg) => {
-                notify.error(msg);
+                dispatch(setErrorNotification(msg));
             }, () => {
                 throw e;
             });
             return;
         }
 
-        notify.msg(`new blog "${title}" by "${author}" added`);
+        dispatch(setInfoNotification(`new blog "${title}" by "${author}" added`));
 
         toggleRef.current.hide();
         // don't just add the blog returned from the create call because it
@@ -89,9 +75,9 @@ const App = () => {
             'Hello. Here are my blogs.' :
             'You must log in to see my blogs.'}</h1>
 
-        <Notification notification={notification} />
+        <Notification />
 
-        <Login user={user} setUser={setUser} notify={notify} />
+        <Login user={user} setUser={setUser} />
 
         {user &&
             <>

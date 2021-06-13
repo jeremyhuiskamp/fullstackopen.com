@@ -45,6 +45,15 @@ describe('Blog app', function () {
                 .and('contain', 'blog author');
         });
 
+        it('Invalid blog creation messages are displayed', function () {
+            cy.contains('new blog').click();
+            // no content -> should be rejected by backend
+            cy.contains('submit').click();
+
+            cy.get('.notification')
+                .should('contain', 'Blog validation failed:');
+        });
+
         describe('When a blog post exists', function () {
             beforeEach(function () {
                 cy.createBlog('title1', 'author1', 'http://url1');

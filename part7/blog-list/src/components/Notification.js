@@ -1,25 +1,21 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 
-const Notification = ({ notification }) => {
-    if (!notification?.msg) {
-        return null;
+const Notification = () => {
+    const notification = useSelector(state => state.notification);
+
+    const [msg, className] = notification.error !== undefined ?
+        [notification.error, 'error'] :
+        notification.info !== undefined ?
+            [notification.info, 'info'] : [undefined, undefined];
+    if (!msg) {
+        return <></>;
     }
 
-    return <div
-        className="notification"
-        style={{
-            color: notification.isError ? 'red' : 'green',
-        }}>
-        {notification.msg}
+    const classNames = `notification ${className}`;
+    return <div data-testid='notification' className={classNames}>
+        {msg}
     </div>;
-};
-
-Notification.propTypes = {
-    notification: PropTypes.shape({
-        isError: PropTypes.bool.isRequired,
-        msg: PropTypes.string,
-    }),
 };
 
 export default Notification;

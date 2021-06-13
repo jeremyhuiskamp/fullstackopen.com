@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import loginService from '../services/login';
+import { useDispatch } from 'react-redux';
+import {
+    setErrorNotification,
+    clearNotification,
+} from '../reducers/notificationReducer';
 
-const Login = ({ user, setUser, notify }) => {
+const Login = ({ user, setUser }) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+
+    const dispatch = useDispatch();
 
     // Check local storage for existing user and register listener for future
     // changes:
@@ -48,10 +55,10 @@ const Login = ({ user, setUser, notify }) => {
             setUsername('');
             setPassword('');
             console.log('logged in');
-            notify.clear();
+            dispatch(clearNotification());
         } catch (e) {
             console.log(e.response?.data?.error ?? e);
-            notify.error(`login failed: ${e.response?.data?.error}`);
+            dispatch(setErrorNotification(`login failed: ${e.response?.data?.error}`));
         }
     };
 
@@ -93,10 +100,6 @@ const Login = ({ user, setUser, notify }) => {
 Login.propTypes = {
     user: PropTypes.object,
     setUser: PropTypes.func.isRequired,
-    notify: PropTypes.shape({
-        error: PropTypes.func.isRequired,
-        clear: PropTypes.func.isRequired,
-    }),
 };
 
 export default Login;
