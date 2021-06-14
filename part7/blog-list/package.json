@@ -45,6 +45,7 @@
         "@testing-library/react": "^11.2.5",
         "@testing-library/user-event": "^13.1.9",
         "cypress": "^7.5.0",
+        "deep-freeze": "^0.0.1",
         "eslint": "^7.14.0",
         "eslint-plugin-cypress": "^2.11.2",
         "eslint-plugin-react": "^7.22.0"
