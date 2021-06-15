@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import './App.css';
 import Blog from './components/Blog';
 import Login from './components/Login';
@@ -14,15 +14,14 @@ import {
 } from './reducers/blogReducer';
 
 const App = () => {
-    const [user, setUser] = useState(null);
     const toggleRef = useRef();
 
     const dispatch = useDispatch();
-    const blogs = useSelector(state => state.blogs);
+    const { blogs, user } = useSelector(state => state);
 
     useEffect(() => {
         dispatch(refreshBlogs());
-    }, []);
+    }, [user]);
 
     const create = async (title, author, url) => {
         dispatch(createBlog(title, author, url, user));
@@ -44,7 +43,7 @@ const App = () => {
 
         <Notification />
 
-        <Login user={user} setUser={setUser} />
+        <Login />
 
         {user &&
             <>

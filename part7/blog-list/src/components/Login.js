@@ -1,17 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import loginService from '../services/login';
-import { useDispatch } from 'react-redux';
-import {
-    setErrorNotification,
-    clearNotification,
-} from '../reducers/notificationReducer';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, loggedIn, tryLogin } from '../reducers/userReducer';
 
-const Login = ({ user, setUser }) => {
+const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     const dispatch = useDispatch();
+    const user = useSelector(state => state.user);
 
     // Check local storage for existing user and register listener for future
     // changes:
@@ -20,10 +16,10 @@ const Login = ({ user, setUser }) => {
             const localStorageUser = localStorage.getItem('loggedInUser');
             if (localStorageUser) {
                 console.log('found loggedInUser in local storage');
-                setUser(JSON.parse(localStorageUser));
+                dispatch(loggedIn(JSON.parse(localStorageUser)));
             } else {
                 console.log('found no loggedInUser in local storage');
-                setUser(null);
+                dispatch(logout());
             }
         };
         checkForLoggedInUser();
@@ -34,10 +30,10 @@ const Login = ({ user, setUser }) => {
     }, []);
 
     // Whenever the user changes, update local storage.
-    // NB: this will fire after we setUser if we detect a change from another
-    // tab, and we'll write the same value back to local storage.  Writing the
-    // same value back does not appear to trigger the event listener in other
-    // tabs, but if it did, we'd probably trigger an infinite loop...
+    // NB: this will fire after we dispatch(loggedIn) if we detect a change from
+    // another tab, and we'll write the same value back to local storage.
+    // Writing the same value back does not appear to trigger the event listener
+    // in other tabs, but if it did, we'd probably trigger an infinite loop...
     useEffect(() => {
         if (user) {
             localStorage.setItem('loggedInUser', JSON.stringify(user));
@@ -46,32 +42,26 @@ const Login = ({ user, setUser }) => {
         }
     }, [user]);
 
-    const tryLogin = async event => {
+    const _tryLogin = async event => {
         event.preventDefault();
-        console.log('trying to log in...');
 
-        try {
-            setUser(await loginService.login(username, password));
-            setUsername('');
-            setPassword('');
-            console.log('logged in');
-            dispatch(clearNotification());
-        } catch (e) {
-            console.log(e.response?.data?.error ?? e);
-            dispatch(setErrorNotification(`login failed: ${e.response?.data?.error}`));
-        }
+        dispatch(tryLogin(username, password));
+        // can we delay the clearing of the form until we know if the login
+        // succeeded?
+        setUsername('');
+        setPassword('');
     };
 
     if (user) {
         return <div>
             Welcome {user.username}.
             &nbsp;
-            <button onClick={() => setUser(null)}>Logout</button>
+            <button onClick={() => dispatch(logout())}>Logout</button>
         </div >;
     }
 
     return <div>
-        <form onSubmit={tryLogin}>
+        <form onSubmit={_tryLogin}>
             <div>
                 Username:
                 &nbsp;
@@ -95,11 +85,6 @@ const Login = ({ user, setUser }) => {
             <button type="submit" id="login">login</button>
         </form>
     </div>;
-};
-
-Login.propTypes = {
-    user: PropTypes.object,
-    setUser: PropTypes.func.isRequired,
 };
 
 export default Login;

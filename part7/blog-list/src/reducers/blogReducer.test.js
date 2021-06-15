@@ -16,6 +16,8 @@ import { waitFor } from '@testing-library/dom';
 const uuid = require('uuid');
 
 describe('blog reducer', () => {
+    jest.spyOn(console, 'error').mockImplementation(() => { });
+
     test('initial state should be empty', () => {
         const newState = reducer(undefined, undefined);
 
