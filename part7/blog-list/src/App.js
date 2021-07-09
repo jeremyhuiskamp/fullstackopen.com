@@ -1,17 +1,24 @@
 import React, { useEffect, useRef } from 'react';
+import {
+    Route,
+    Switch,
+} from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+
 import './App.css';
 import Blog from './components/Blog';
 import Login from './components/Login';
 import BlogCreator from './components/BlogCreator';
 import Notification from './components/Notification';
 import Toggle from './components/Toggle';
-import { useDispatch, useSelector } from 'react-redux';
+import Users from './components/Users';
 import {
     likeBlog,
     refreshBlogs,
     removeBlog,
     createBlog,
 } from './reducers/blogReducer';
+import { refreshUsers } from './reducers/usersReducer';
 
 const App = () => {
     const toggleRef = useRef();
@@ -21,6 +28,7 @@ const App = () => {
 
     useEffect(() => {
         dispatch(refreshBlogs());
+        dispatch(refreshUsers());
     }, [user]);
 
     const create = async (title, author, url) => {
@@ -37,6 +45,7 @@ const App = () => {
     };
 
     return <>
+        {/* TODO: customise this per route? */}
         <h1>{user ?
             'Hello. Here are my blogs.' :
             'You must log in to see my blogs.'}</h1>
@@ -46,21 +55,27 @@ const App = () => {
         <Login />
 
         {user &&
-            <>
-                <Toggle buttonLabel="new blog" ref={toggleRef}>
-                    <BlogCreator createBlog={create} />
-                </Toggle>
+            <Switch>
+                <Route path='/users'>
+                    <h2>Users</h2>
+                    <Users />
+                </Route>
+                <Route path='/'>
+                    <Toggle buttonLabel="new blog" ref={toggleRef}>
+                        <BlogCreator createBlog={create} />
+                    </Toggle>
 
-                <div id="blogs">
-                    {blogs.map(blog =>
-                        <Blog
-                            key={blog.id}
-                            blog={blog}
-                            like={like}
-                            remove={blog.user?.username === user.username ? remove : undefined} />)
-                    }
-                </div>
-            </>}
+                    <div id="blogs">
+                        {blogs.map(blog =>
+                            <Blog
+                                key={blog.id}
+                                blog={blog}
+                                like={like}
+                                remove={blog.user?.username === user.username ? remove : undefined} />)
+                        }
+                    </div>
+                </Route>
+            </Switch>}
     </>;
 };
 

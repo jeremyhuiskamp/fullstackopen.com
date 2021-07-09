@@ -110,4 +110,30 @@ describe('Blog app', function () {
             });
         });
     });
+
+    describe('users page', function () {
+        it('can be viewed', function () {
+            cy.createUser('Normal User', 'user', 'zekret');
+
+            cy.login('root', 'sekret');
+            cy.visit('http://localhost:3000/users');
+            cy.get('h2').contains('Users');
+
+            // TODO: create a blog for at least one user?
+
+            // wait until table is populated:
+            cy.get('table').contains('Normal User');
+
+            // Learned this from:
+            // https://github.com/roggerfe/cypress-get-table/blob/master/src/index.js
+            cy.get('table tbody tr td').then(tds => {
+                const content = [...tds].map(td => td.textContent);
+                // is the order predictable here?
+                expect(content).to.eql([
+                    'root', '0',
+                    'Normal User', '0',
+                ]);
+            });
+        });
+    });
 });
