@@ -109,30 +109,60 @@ describe('Blog app', function () {
                 ]);
             });
         });
-    });
 
-    describe('users page', function () {
-        it('can be viewed', function () {
-            cy.createUser('Normal User', 'user', 'zekret');
+        describe('users page', function () {
+            it('can be viewed', function () {
+                cy.createBlog('title1', 'author1', 'http://url1');
 
-            cy.login('root', 'sekret');
-            cy.visit('http://localhost:3000/users');
-            cy.get('h2').contains('Users');
+                cy.createUser('Normal User', 'user', 'zekret');
 
-            // TODO: create a blog for at least one user?
+                cy.visit('http://localhost:3000/users');
+                cy.get('h2').contains('Users');
 
-            // wait until table is populated:
-            cy.get('table').contains('Normal User');
+                // wait until table is populated:
+                cy.get('table').contains('Normal User');
 
-            // Learned this from:
-            // https://github.com/roggerfe/cypress-get-table/blob/master/src/index.js
-            cy.get('table tbody tr td').then(tds => {
-                const content = [...tds].map(td => td.textContent);
-                // is the order predictable here?
-                expect(content).to.eql([
-                    'root', '0',
-                    'Normal User', '0',
-                ]);
+                // Learned this from:
+                // https://github.com/roggerfe/cypress-get-table/blob/master/src/index.js
+                cy.get('table tbody tr td').then(tds => {
+                    const content = [...tds].map(td => td.textContent);
+                    // is the order predictable here?
+                    expect(content).to.eql([
+                        'root', '1',
+                        'Normal User', '0',
+                    ]);
+                });
+            });
+        });
+
+        describe('view individual user', function () {
+            it('unkown user', function () {
+                cy.visit('http://localhost:3000/users/123');
+                cy.get('h2').contains('Unknown user');
+            });
+
+            it('visit known user directly', function () {
+                cy.visit(`http://localhost:3000/users/${this.root.id}`);
+                cy.get('h2').contains('root');
+            });
+
+            it('known user with blogs', function () {
+                cy.createUser('Normal User', 'user', 'zekret');
+
+                cy.login('user', 'zekret');
+                cy.createBlog('title1', 'author1', 'http://url1');
+                cy.createBlog('title2', 'author2', 'http://url2');
+
+                cy.login('root', 'sekret');
+                cy.createBlog('title3', 'author3', 'http://url3');
+
+                cy.visit('http://localhost:3000/users');
+
+                cy.get('table').contains('Normal User').click();
+                cy.get('ul li').then(blogItems => {
+                    const titles = [...blogItems].map(li => li.textContent);
+                    expect(titles).to.eql(['title1', 'title2']);
+                });
             });
         });
     });

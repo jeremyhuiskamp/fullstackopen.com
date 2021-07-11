@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import {
     Route,
     Switch,
+    useRouteMatch,
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -19,6 +20,7 @@ import {
     createBlog,
 } from './reducers/blogReducer';
 import { refreshUsers } from './reducers/usersReducer';
+import User from './components/User';
 
 const App = () => {
     const toggleRef = useRef();
@@ -44,6 +46,8 @@ const App = () => {
         dispatch(removeBlog(blog, user));
     };
 
+    const matchedUserId = useRouteMatch('/users/:id');
+
     return <>
         {/* TODO: customise this per route? */}
         <h1>{user ?
@@ -56,6 +60,9 @@ const App = () => {
 
         {user &&
             <Switch>
+                <Route path='/users/:id'>
+                    <User userId={matchedUserId?.params?.id} />
+                </Route>
                 <Route path='/users'>
                     <h2>Users</h2>
                     <Users />

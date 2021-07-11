@@ -26,7 +26,7 @@ Cypress.Commands.add('createUser', (name, username, password) => {
         name,
         username,
         password,
-    });
+    }).then(rsp => rsp.body).as(username);
 });
 
 Cypress.Commands.add('likeBlog', (id, likes) => {
