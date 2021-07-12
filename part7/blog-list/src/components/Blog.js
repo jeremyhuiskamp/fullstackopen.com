@@ -1,17 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 const Blog = ({ blog, like, remove }) => {
-    const [expanded, setExpanded] = useState(false);
+    if (!blog) {
+        // TODO: consider showing "not found"
+        // Not sure here if we're waiting for the blogs to arrive, or if the
+        // blog doesn't actually exist...
+        return <></>;
+    }
 
     const { title, author, url, likes, user: { username } } = blog;
-
-    const blogStyle = {
-        padding: 10,
-        marginTop: 10,
-        background: 'aliceblue',
-        cursor: 'pointer',
-    };
 
     const blockEventPropagation = f => {
         return e => {
@@ -20,22 +18,18 @@ const Blog = ({ blog, like, remove }) => {
         };
     };
 
-    return <div className='blog' style={blogStyle} onClick={() => setExpanded(!expanded)}>
-        &quot;<a href={url} onClick={(e) => e.stopPropagation()}>{title}</a>&quot; by <b> {author}</b>&nbsp;
-        {expanded ?
-            <>
-                ▼
-                <br />
-                {likes} <span onClick={blockEventPropagation(like)}>👍</span>
-                <br />
-                added by: {username}
-                {remove && <>
-                    <br />
-                    <button onClick={blockEventPropagation(remove)}>remove</button>
-                </>}
-            </>
-            : <>►</>
-        }
+    return <div className='blog'>
+        <h2>{title} <i>by</i> {author}</h2>
+        <a href={url}>{url}</a>
+
+        <br />
+        {likes} <span onClick={blockEventPropagation(like)}>👍</span>
+        <br />
+        added by: {username}
+        {remove && <>
+            <br />
+            <button onClick={blockEventPropagation(remove)}>remove</button>
+        </>}
     </div>;
 };
 
@@ -48,7 +42,7 @@ Blog.propTypes = {
         user: PropTypes.shape({
             username: PropTypes.string.isRequired,
         }),
-    }).isRequired,
+    }),
     like: PropTypes.func.isRequired,
     remove: PropTypes.func,
 };

@@ -1,10 +1,12 @@
 import React, { useEffect, useRef } from 'react';
 import {
+    Link,
     Route,
     Switch,
     useRouteMatch,
 } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
+import { useHistory } from 'react-router-dom';
 
 import './App.css';
 import Blog from './components/Blog';
@@ -23,6 +25,7 @@ import { refreshUsers } from './reducers/usersReducer';
 import User from './components/User';
 
 const App = () => {
+    const history = useHistory();
     const toggleRef = useRef();
 
     const dispatch = useDispatch();
@@ -44,9 +47,12 @@ const App = () => {
 
     const remove = blog => {
         dispatch(removeBlog(blog, user));
+        history.push('/');
     };
 
     const matchedUserId = useRouteMatch('/users/:id');
+    const matchedBlogId = useRouteMatch('/blogs/:id');
+    const matchedBlog = blogs.find(b => b.id === matchedBlogId?.params?.id);
 
     return <>
         {/* TODO: customise this per route? */}
@@ -67,20 +73,30 @@ const App = () => {
                     <h2>Users</h2>
                     <Users />
                 </Route>
+                <Route path='/blogs/:id'>
+                    <Blog
+                        blog={matchedBlog}
+                        like={like}
+                        remove={matchedBlog?.user?.username === user.username ? remove : undefined} />
+                </Route>
                 <Route path='/'>
                     <Toggle buttonLabel="new blog" ref={toggleRef}>
                         <BlogCreator createBlog={create} />
                     </Toggle>
 
-                    <div id="blogs">
+                    <ul id="blogs">
                         {blogs.map(blog =>
-                            <Blog
-                                key={blog.id}
-                                blog={blog}
-                                like={like}
-                                remove={blog.user?.username === user.username ? remove : undefined} />)
-                        }
-                    </div>
+                            <li key={blog.id} className='blog'>
+                                <Link to={`/blogs/${blog.id}`}>
+                                    &quot;
+                                    <span className='blogTitle'>{blog.title}</span>
+                                    &quot; by <b>{blog.author}</b>
+                                </Link>
+                                &nbsp;&mdash;&nbsp;
+                                {blog.likes} 👍
+                            </li>
+                        )}
+                    </ul>
                 </Route>
             </Switch>}
     </>;

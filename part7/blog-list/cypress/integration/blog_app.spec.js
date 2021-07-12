@@ -61,14 +61,14 @@ describe('Blog app', function () {
             });
 
             it('blog can be liked', function () {
-                cy.get('@blog').click(); // expand details
-                cy.get('@blog').contains('👍').click();
-                cy.get('@blog').contains('1 👍');
+                cy.get('@blog').get('a:first').click();
+                cy.get('.blog').contains('👍').click();
+                cy.get('.blog').contains('1 👍');
             });
 
             it('blog can be deleted by creator', function () {
-                cy.get('@blog').click(); // expand details
-                cy.get('@blog').contains('remove').click();
+                cy.get('@blog').get('a:first').click();
+                cy.get('.blog').contains('remove').click();
                 cy.get('#blogs').should('be.empty');
             });
 
@@ -76,8 +76,8 @@ describe('Blog app', function () {
                 cy.createUser('the other admin', 'root2', 'zekret');
                 cy.login('root2', 'zekret');
 
-                cy.get('@blog').click(); // expand details
-                cy.get('@blog').should('not.contain', 'remove');
+                cy.get('@blog').get('a:first').click();
+                cy.get('.blog').should('not.contain', 'remove');
             });
         });
 
@@ -99,7 +99,7 @@ describe('Blog app', function () {
 
             cy.get('#blogs').get('.blog').then(blogs => {
                 const titles = blogs.map((_, blog) =>
-                    Cypress.$(blog).find('a:first').text()).get();
+                    Cypress.$(blog).find('.blogTitle').text()).get();
 
                 expect(titles).to.have.ordered.members([
                     'title3',
